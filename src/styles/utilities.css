@@ -1,0 +1,48 @@
+/* Centering */
+
+@utility center-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@utility center-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+@utility center-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Layout */
+
+@utility stack {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Transitions */
+
+@utility transition-smooth {
+  transition-property:
+    color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-smooth);
+}
+
+/* Focus */
+
+@utility focus-ring {
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--color-bg-base),
+      0 0 0 4px var(--color-ring);
+  }
+}

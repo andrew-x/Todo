@@ -1,0 +1,67 @@
+@import 'tailwindcss';
+@import './utilities.css';
+
+@theme {
+  /* Background layers (elevation via luminance — lighter = higher) */
+  --color-bg-base: oklch(0.141 0.005 285.823); /* zinc-950 */
+  --color-bg-raised: oklch(0.21 0.006 285.885); /* zinc-900 */
+  --color-bg-overlay: oklch(0.274 0.006 286.033); /* zinc-800 */
+
+  /* Interactive surfaces */
+  --color-surface: oklch(0.21 0.006 285.885); /* zinc-900 */
+  --color-surface-hover: oklch(0.274 0.006 286.033); /* zinc-800 */
+  --color-surface-active: oklch(0.37 0.013 285.805); /* zinc-700 */
+  --color-surface-selected: oklch(0.274 0.006 286.033); /* zinc-800 */
+
+  /* Text hierarchy */
+  --color-text-primary: oklch(0.985 0 0); /* zinc-50 */
+  --color-text-secondary: oklch(0.705 0.015 286.067); /* zinc-400 */
+  --color-text-tertiary: oklch(0.552 0.016 285.938); /* zinc-500 */
+  --color-text-disabled: oklch(0.442 0.017 285.786); /* zinc-600 */
+  --color-text-inverse: oklch(0.141 0.005 285.823); /* zinc-950 */
+
+  /* Borders */
+  --color-border-default: oklch(0.274 0.006 286.033); /* zinc-800 */
+  --color-border-hover: oklch(0.37 0.013 285.805); /* zinc-700 */
+  --color-border-focus: oklch(0.673 0.182 276.935); /* indigo-400 */
+
+  /* Accent (indigo) */
+  --color-accent: oklch(0.585 0.233 277.117); /* indigo-500 */
+  --color-accent-hover: oklch(0.511 0.262 276.966); /* indigo-600 */
+  --color-accent-subtle: oklch(
+    0.585 0.233 277.117 / 0.15
+  ); /* indigo-500 @ 15% */
+  --color-accent-text: oklch(0.673 0.182 276.935); /* indigo-400 */
+
+  /* Status */
+  --color-success: oklch(0.792 0.209 151.711); /* green-400 */
+  --color-success-subtle: oklch(
+    0.792 0.209 151.711 / 0.15
+  ); /* green-400 @ 15% */
+  --color-warning: oklch(0.828 0.189 84.429); /* amber-400 */
+  --color-warning-subtle: oklch(
+    0.828 0.189 84.429 / 0.15
+  ); /* amber-400 @ 15% */
+  --color-error: oklch(0.704 0.191 22.216); /* red-400 */
+  --color-error-subtle: oklch(0.704 0.191 22.216 / 0.15); /* red-400 @ 15% */
+
+  /* Utilities */
+  --color-ring: oklch(0.585 0.233 277.117 / 0.5); /* indigo-500 @ 50% */
+  --ease-smooth: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-bg-base text-text-secondary antialiased;
+  }
+
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border-default);
+  }
+}

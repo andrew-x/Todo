@@ -20,3 +20,15 @@
 - PascalCase for component files, component folders, and component names
 - `on` prefix for event handler props (e.g., `onSubmit`, `onClick`)
 - Boolean variables and props use `is`, `has`, `should` prefixes (e.g., `isLoading`, `hasError`)
+
+## Icons (Phosphor Icons)
+
+- Always import with the `Icon` suffix — the bare noun import is deprecated
+
+  ```ts
+  // Correct
+  import { CheckIcon, TrashIcon } from '@phosphor-icons/react'
+
+  // Wrong (deprecated)
+  import { Check, Trash } from '@phosphor-icons/react'
+  ```

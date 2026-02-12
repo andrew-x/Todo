@@ -2,7 +2,15 @@
 
 Simple todo app with unified input that auto-detects tags, labels, and dates.
 
-> **Self-maintaining doc**: Keep this file up to date. When a new convention, pattern, dependency, or workflow change is introduced during a conversation, update CLAUDE.md immediately to reflect it. This includes new libraries, folder changes, naming rules, architectural decisions, and any user-specified preferences.
+> **Self-maintaining doc.** Keep this file up to date when conventions, patterns, or workflows change. Follow **progressive disclosure** — this file stays minimal and scannable; detailed guidance lives in `.claude/rules/` and `docs/`. When adding new information, put the details in the appropriate rules or docs file and add only a brief pointer here.
+
+## Working Style
+
+Be a **collaborator, not a yes-man.** Challenge requests that seem off, suggest better alternatives, and surface forgotten constraints — the user is fallible and expects pushback. Gather all the information you need before writing code: ask clarifying questions, flag ambiguous requirements, and confirm approach on non-trivial work. Bias toward asking one round of good questions over making assumptions.
+
+**Continuously improve the Claude Code setup.** As we work, proactively suggest improvements to the project's `.claude/` configuration — new rules, subagents, skills, hooks, or updates to existing ones. Follow current Claude Code best practices and look for opportunities to optimize the development workflow. Don't wait to be asked; if you notice a gap or a better pattern, raise it.
+
+**Capture user preferences.** When a conversation reveals a preference, convention, or repeated correction (e.g., "always use X", "I prefer Y over Z", styling opinions, workflow habits), record it in the appropriate place — `.claude/rules/`, `CLAUDE.md`, or auto-memory — so it persists across sessions. Confirm with the user before writing if the preference seems ambiguous.
 
 ## Tech Stack
 
@@ -35,22 +43,14 @@ src/
 docs/               # Feature documentation, data flows, architecture notes
 ```
 
-## Docs Librarian
+## Reference
 
-This project uses a `docs-librarian` subagent to maintain living documentation in `/docs`.
-
-**When to consult it (read):**
-
-- Before implementing changes to a feature — ask the librarian how it currently works to get up-to-date context instead of exploring the codebase yourself.
-- When you need to understand a data flow, component hierarchy, or how pieces of the system fit together.
-
-**When to update it (write):**
-
-- After implementing a new feature or completing a significant change to an existing feature, proactively launch the librarian to document what was built/changed.
-- After refactoring that alters architecture, file structure, or data flows.
-
-**How to call it:**
-Use the `Task` tool with `subagent_type: "docs-librarian"`. Be specific in the prompt:
-
-- **Reading:** "Explain how [feature X] currently works — check /docs and the source code, then give me a summary."
-- **Writing:** "I just implemented [describe change]. Review the code and create/update documentation in /docs to reflect this."
+| Topic                       | Location                                          |
+| --------------------------- | ------------------------------------------------- |
+| Code style & philosophy     | `.claude/rules/code-style.md`                     |
+| Project structure & imports | `.claude/rules/project-structure.md`              |
+| React conventions           | `.claude/rules/react.md`                          |
+| Agents & skills             | `.claude/rules/agents-and-skills.md`              |
+| Theme & styling tokens      | `.claude/rules/theme.md`                          |
+| Design system components    | `.claude/rules/design-system.md`                  |
+| Feature docs & data flows   | `docs/` (maintained by `docs-librarian` subagent) |

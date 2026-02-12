@@ -6,15 +6,21 @@ import LandingPage from '@/pages/LandingPage'
 function RootLayout() {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex items-center gap-4 border-b px-6 py-3">
-        <Link to="/" className="font-semibold">
+      <header className="bg-bg-raised flex items-center gap-4 border-b px-6 py-3">
+        <Link to="/" className="text-text-primary font-semibold">
           Todo
         </Link>
         <nav className="flex gap-4">
-          <Link to="/" className="hover:underline">
+          <Link
+            to="/"
+            className="text-text-secondary transition-smooth hover:text-text-primary"
+          >
             Landing
           </Link>
-          <Link to="/home" className="hover:underline">
+          <Link
+            to="/home"
+            className="text-text-secondary transition-smooth hover:text-text-primary"
+          >
             Home
           </Link>
         </nav>
