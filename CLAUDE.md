@@ -26,15 +26,10 @@ bun run format   # prettier --write
 
 ```
 src/
-  app/              # App shell, routing, providers
-  features/
-    todos/          # Todo list, items, unified input, filters
-    auth/           # Login, signup, auth state
-  shared/
-    components/     # Reusable UI (Button, Input, Badge, etc.)
-    hooks/          # Shared hooks
-    utils/          # Helpers (date parsing, tag extraction)
-    types/          # Shared TypeScript types
+  pages/            # Route-level page components
+  components/       # Components separated by feature area
+    common/         # Design system / shared UI components
+  lib/              # Libraries, utilities, and helpers
   store/            # RTK store setup, API slice base
   firebase/         # Firebase app init, auth helpers, Firestore refs
 docs/               # Feature documentation, data flows, architecture notes
@@ -45,14 +40,17 @@ docs/               # Feature documentation, data flows, architecture notes
 This project uses a `docs-librarian` subagent to maintain living documentation in `/docs`.
 
 **When to consult it (read):**
+
 - Before implementing changes to a feature — ask the librarian how it currently works to get up-to-date context instead of exploring the codebase yourself.
 - When you need to understand a data flow, component hierarchy, or how pieces of the system fit together.
 
 **When to update it (write):**
+
 - After implementing a new feature or completing a significant change to an existing feature, proactively launch the librarian to document what was built/changed.
 - After refactoring that alters architecture, file structure, or data flows.
 
 **How to call it:**
 Use the `Task` tool with `subagent_type: "docs-librarian"`. Be specific in the prompt:
+
 - **Reading:** "Explain how [feature X] currently works — check /docs and the source code, then give me a summary."
 - **Writing:** "I just implemented [describe change]. Review the code and create/update documentation in /docs to reflect this."
