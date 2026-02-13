@@ -20,6 +20,11 @@
   justify-content: center;
 }
 
+@utility size-full {
+  width: 100%;
+  height: 100%;
+}
+
 /* Layout */
 
 @utility stack {
@@ -44,5 +49,34 @@
     box-shadow:
       0 0 0 2px var(--color-bg-base),
       0 0 0 4px var(--color-ring);
+  }
+}
+
+/* Tooltip */
+
+@utility tooltip {
+  position: relative;
+
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-overlay);
+    color: var(--color-text-primary);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 150ms;
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 1;
   }
 }

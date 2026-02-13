@@ -38,5 +38,7 @@ Prompt examples:
 
 ## Skills (via `Skill` tool)
 
+- **`rtk-query`** — RTK Query patterns and best practices for this project (`fakeBaseQuery` + Firestore). Invoke when writing, reviewing, or refactoring API endpoints, mutations, cache tags, optimistic updates, or streaming listeners.
+- **`firebase-best-practices`** — Firebase setup, auth, Firestore, and performance rules. Invoke when writing, reviewing, or refactoring Firebase code — auth flows, Firestore queries, security rules, or bundle optimization.
 - **`react-best-practices`** — Vercel's React performance optimization guidelines. Invoke when writing, reviewing, or refactoring React components.
 - **`web-design-guidelines`** — Web Interface Guidelines review. Invoke when asked to review UI, check accessibility, audit design, or review UX.

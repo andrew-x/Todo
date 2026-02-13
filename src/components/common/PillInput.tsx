@@ -3,17 +3,17 @@ import { useId, useState } from 'react'
 import cn from '@/lib/classnames'
 import type { Size } from '@/lib/types'
 
-import { Pill } from './Pill'
+import Pill from './Pill'
 
 const containerSizeClasses: Record<string, string> = {
-  xs: 'min-h-6 rounded px-2 text-xs',
-  sm: 'min-h-8 rounded-md px-3 text-sm',
-  md: 'min-h-10 rounded-lg px-3 text-sm',
-  lg: 'min-h-12 rounded-lg px-4 text-base',
-  xl: 'min-h-14 rounded-xl px-5 text-lg',
+  xs: 'min-h-6 rounded-sm px-2 text-xs',
+  sm: 'min-h-8 rounded px-3 text-sm',
+  md: 'min-h-10 rounded-md px-3 text-sm',
+  lg: 'min-h-12 rounded-md px-4 text-base',
+  xl: 'min-h-14 rounded-lg px-5 text-lg',
 }
 
-interface PillInputProps {
+export interface PillInputProps {
   values: string[]
   onValuesChange: (values: string[]) => void
   label?: string
@@ -24,7 +24,7 @@ interface PillInputProps {
   className?: string
 }
 
-function PillInput({
+export default function PillInput({
   values,
   onValuesChange,
   label,
@@ -119,6 +119,3 @@ function PillInput({
     </div>
   )
 }
-
-export { PillInput }
-export type { PillInputProps }

@@ -8,11 +8,11 @@ const textAreaVariants = cva(
   {
     variants: {
       size: {
-        xs: 'rounded px-2 py-1 text-xs',
-        sm: 'rounded-md px-3 py-1.5 text-sm',
-        md: 'rounded-lg px-4 py-2 text-sm',
-        lg: 'rounded-lg px-5 py-2.5 text-base',
-        xl: 'rounded-xl px-6 py-3 text-lg',
+        xs: 'rounded-sm px-2 py-1 text-xs',
+        sm: 'rounded px-3 py-1.5 text-sm',
+        md: 'rounded-md px-4 py-2 text-sm',
+        lg: 'rounded-md px-5 py-2.5 text-base',
+        xl: 'rounded-lg px-6 py-3 text-lg',
       },
     },
     defaultVariants: {
@@ -21,7 +21,7 @@ const textAreaVariants = cva(
   },
 )
 
-type TextAreaProps = Omit<
+export type TextAreaProps = Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   'size'
 > &
@@ -30,7 +30,13 @@ type TextAreaProps = Omit<
     error?: string
   }
 
-function TextArea({ label, error, size, className, ...props }: TextAreaProps) {
+export default function TextArea({
+  label,
+  error,
+  size,
+  className,
+  ...props
+}: TextAreaProps) {
   const id = useId()
   const textAreaId = props.id ?? id
 
@@ -59,6 +65,3 @@ function TextArea({ label, error, size, className, ...props }: TextAreaProps) {
     </div>
   )
 }
-
-export { TextArea }
-export type { TextAreaProps }

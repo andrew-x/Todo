@@ -16,8 +16,8 @@ const pillVariants = cva(
         error: 'bg-error-subtle text-error',
       },
       size: {
-        sm: 'h-6 gap-1 rounded px-2 text-xs',
-        md: 'h-7 gap-1.5 rounded-md px-2.5 text-xs',
+        sm: 'h-6 gap-1 rounded-sm px-2 text-xs',
+        md: 'h-7 gap-1.5 rounded px-2.5 text-xs',
       },
     },
     defaultVariants: {
@@ -27,12 +27,12 @@ const pillVariants = cva(
   },
 )
 
-type PillProps = React.HTMLAttributes<HTMLSpanElement> &
+export type PillProps = React.HTMLAttributes<HTMLSpanElement> &
   VariantProps<typeof pillVariants> & {
     onRemove?: () => void
   }
 
-function Pill({
+export default function Pill({
   color,
   size,
   onRemove,
@@ -56,6 +56,3 @@ function Pill({
     </span>
   )
 }
-
-export { Pill }
-export type { PillProps }

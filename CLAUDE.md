@@ -12,6 +12,10 @@ Be a **collaborator, not a yes-man.** Challenge requests that seem off, suggest 
 
 **Capture user preferences.** When a conversation reveals a preference, convention, or repeated correction (e.g., "always use X", "I prefer Y over Z", styling opinions, workflow habits), record it in the appropriate place — `.claude/rules/`, `CLAUDE.md`, or auto-memory — so it persists across sessions. Confirm with the user before writing if the preference seems ambiguous.
 
+**Plans include subagent usage.** When generating implementation plans, always list which subagents (e.g., `docs-librarian`, `tech-researcher`, `design-system-specialist`, `code-reviewer`) and skills will be used during execution, and at which steps.
+
+**Keep `docs/` in sync with the code.** After implementing a new feature, changing existing feature behavior, or making any modification that deviates from what's currently documented in `docs/`, you **must** launch the `docs-librarian` subagent to update the affected documentation. Don't wait to be asked — treat outdated docs as a bug. This applies to architecture changes, new components, altered data flows, renamed files, and removed features. The goal: `docs/` always reflects the current state of the repo.
+
 ## Tech Stack
 
 - React 19, TypeScript 5.9 (strict), Vite 7
@@ -36,21 +40,28 @@ bun run format   # prettier --write
 src/
   pages/            # Route-level page components
   components/       # Components separated by feature area
+    auth/           # Auth context, route guard, sign-in button
     common/         # Design system / shared UI components
-  lib/              # Libraries, utilities, and helpers
-  store/            # RTK store setup, API slice base
-  firebase/         # Firebase app init, auth helpers, Firestore refs
+    tasks/          # Task display & DnD building blocks
+    views/          # Page-level view orchestrators (WorkView, WeekView, etc.)
+    task-editor/    # Task creation, editing, smart input
+    settings/       # App-level settings
+  lib/              # Libraries, utilities, helpers, Firebase init (lib/firebase.ts)
+  store/            # RTK store setup, API slice base, feature endpoint files
 docs/               # Feature documentation, data flows, architecture notes
 ```
 
 ## Reference
 
-| Topic                       | Location                                          |
-| --------------------------- | ------------------------------------------------- |
-| Code style & philosophy     | `.claude/rules/code-style.md`                     |
-| Project structure & imports | `.claude/rules/project-structure.md`              |
-| React conventions           | `.claude/rules/react.md`                          |
-| Agents & skills             | `.claude/rules/agents-and-skills.md`              |
-| Theme & styling tokens      | `.claude/rules/theme.md`                          |
-| Design system components    | `.claude/rules/design-system.md`                  |
-| Feature docs & data flows   | `docs/` (maintained by `docs-librarian` subagent) |
+| Topic                       | Location                                                                               |
+| --------------------------- | -------------------------------------------------------------------------------------- |
+| Code style & philosophy     | `.claude/rules/code-style.md`                                                          |
+| Project structure & imports | `.claude/rules/project-structure.md`                                                   |
+| React conventions           | `.claude/rules/react.md`                                                               |
+| Agents & skills             | `.claude/rules/agents-and-skills.md`                                                   |
+| Theme & styling tokens      | `.claude/rules/theme.md`                                                               |
+| Design system components    | `.claude/rules/design-system.md`                                                       |
+| Dates (dayjs)               | `.claude/rules/dates.md`                                                               |
+| RTK Query patterns          | `.claude/skills/rtk-query/` (invoke via `rtk-query` skill)                             |
+| Firebase best practices     | `.claude/skills/firebase-best-practices/` (invoke via `firebase-best-practices` skill) |
+| Feature docs & data flows   | `docs/` (maintained by `docs-librarian` subagent)                                      |

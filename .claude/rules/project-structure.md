@@ -17,8 +17,9 @@
 ## File Organization
 
 - Pages live in `pages/`
-- Components live in `components/` organized by feature area (e.g., `components/auth/`, `components/dashboard/`)
+- Components live in `components/` organized by feature area (e.g., `components/auth/`, `components/tasks/`, `components/views/`)
 - Design system and shared components live in `components/common/`
+- RTK Query endpoint files live in `store/` (e.g., `store/todosApi.ts`)
 - Utility functions live in `lib/util.ts`
 - No barrel files (`index.ts` re-exports) — import directly from the source file
 

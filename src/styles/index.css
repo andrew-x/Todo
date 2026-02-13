@@ -2,6 +2,8 @@
 @import './utilities.css';
 
 @theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+
   /* Background layers (elevation via luminance — lighter = higher) */
   --color-bg-base: oklch(0.141 0.005 285.823); /* zinc-950 */
   --color-bg-raised: oklch(0.21 0.006 285.885); /* zinc-900 */
@@ -59,9 +61,23 @@
     @apply bg-bg-base text-text-secondary antialiased;
   }
 
+  #root {
+    height: 100vh;
+    width: 100vw;
+  }
+
   *,
   *::before,
   *::after {
     border-color: var(--color-border-default);
+  }
+
+  /* Tiptap placeholder */
+  .tiptap p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--color-text-tertiary);
+    pointer-events: none;
+    height: 0;
   }
 }

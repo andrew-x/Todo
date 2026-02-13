@@ -64,13 +64,13 @@ You are an elite Design System Specialist with deep expertise in building and ma
 
 These components exist in `src/components/common/` — read them to understand established patterns before creating new ones:
 
-| Component | Variants | Notes |
-|-----------|----------|-------|
-| `Button` | variant (default/primary/outline/ghost/link), size (xs–xl) | Polymorphic: `href` → `<a>`. `isLoading` for spinner state |
-| `TextInput` | size (xs–xl) | `label`, `error` props. `useId()` for accessible label binding |
-| `TextArea` | size (xs–xl) | Same field pattern as TextInput |
-| `Pill` | color (default/primary/secondary/success/warning/error), size (sm/md) | `onRemove` for dismissible pills |
-| `PillInput` | size (xs–xl) | Controlled `values`/`onValuesChange`. Enter/comma/paste to add, backspace to remove |
+| Component   | Variants                                                              | Notes                                                                               |
+| ----------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `Button`    | variant (default/primary/outline/ghost/link), size (xs–xl)            | Polymorphic: `href` → `<a>`. `isLoading` for spinner state                          |
+| `TextInput` | size (xs–xl)                                                          | `label`, `error` props. `useId()` for accessible label binding                      |
+| `TextArea`  | size (xs–xl)                                                          | Same field pattern as TextInput                                                     |
+| `Pill`      | color (default/primary/secondary/success/warning/error), size (sm/md) | `onRemove` for dismissible pills                                                    |
+| `PillInput` | size (xs–xl)                                                          | Controlled `values`/`onValuesChange`. Enter/comma/paste to add, backspace to remove |
 
 Shared types: `Size`, `Color` in `@/lib/types.ts`
 

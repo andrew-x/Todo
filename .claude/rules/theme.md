@@ -10,6 +10,10 @@ paths:
 
 The app uses a dark-only theme defined in `src/styles/index.css` via Tailwind v4's `@theme` directive. Custom utility classes are in `src/styles/utilities.css`. All color values come from Tailwind's built-in zinc and indigo oklch palettes.
 
+## Typography
+
+The app uses **Inter** (loaded from Google Fonts in `index.html`) as the default sans-serif font, set via `--font-sans` in the theme.
+
 ## Semantic Tokens — Always Use These
 
 Never use raw Tailwind color classes (e.g., `bg-zinc-900`, `text-gray-500`). Always use the semantic tokens:
@@ -17,8 +21,8 @@ Never use raw Tailwind color classes (e.g., `bg-zinc-900`, `text-gray-500`). Alw
 ### Backgrounds (elevation via luminance — lighter = higher)
 
 - `bg-bg-base` — page background (zinc-950)
-- `bg-bg-raised` — cards, panels, header (zinc-900)
-- `bg-bg-overlay` — modals, dropdowns (zinc-800)
+- `bg-bg-raised` — cards, panels, modals, header (zinc-900)
+- `bg-bg-overlay` — dropdowns, floating surfaces (zinc-800)
 
 ### Surfaces (interactive elements)
 
@@ -65,6 +69,7 @@ Never use raw Tailwind color classes (e.g., `bg-zinc-900`, `text-gray-500`). Alw
 | `stack`             | `flex flex-col`                                         | Vertical flex container         |
 | `transition-smooth` | `transition-colors duration-150 ease-smooth`            | Standard interactive transition |
 | `focus-ring`        | Focus-visible ring with `bg-base` offset + `ring` color | Standard focus indicator        |
+| `tooltip`           | `::after` pseudo-element from `data-tooltip` attr       | Hover/focus tooltip on any element |
 
 ## Transitions
 
@@ -80,18 +85,21 @@ Standard focus style: `focus-ring` (replaces `focus-visible:outline-none focus-v
 
 **Use design system components** (`src/components/common/`) instead of hand-rolling these:
 
-| Need | Component |
-|---|---|
-| Button (any variant) | `<Button>` — supports `variant`, `size`, `isLoading`, `href` |
-| Text input with label/error | `<TextInput>` |
-| Textarea with label/error | `<TextArea>` |
-| Tag / badge / pill | `<Pill>` — supports `color`, `size`, `onRemove` |
-| Multi-value tag input | `<PillInput>` |
+| Need                        | Component                                                    |
+| --------------------------- | ------------------------------------------------------------ |
+| Button (any variant)        | `<Button>` — supports `variant`, `size`, `isLoading`, `href` |
+| Icon-only button            | `<IconButton>` — square sizing, required `label` (tooltip + aria-label), `isLoading` |
+| Text input with label/error | `<TextInput>`                                                |
+| Textarea with label/error   | `<TextArea>`                                                 |
+| Tag / badge / pill          | `<Pill>` — supports `color`, `size`, `onRemove`              |
+| Multi-value tag input       | `<PillInput>`                                                |
+| Dropdown select             | `<Select>` — supports `options`, `size`, `placeholder`       |
+| Modal / dialog              | `<Modal>` — supports `size`, `title`, `footer`, `open`/`onClose` |
 
 For elements without a component, use semantic tokens directly:
 
-| Element  | Classes |
-|----------|---------|
-| Card     | `bg-bg-raised border border-border-default rounded-lg` |
-| List row | `bg-surface hover:bg-surface-hover transition-smooth` |
+| Element  | Classes                                                |
+| -------- | ------------------------------------------------------ |
+| Card     | `bg-bg-raised border border-border-default rounded-md` |
+| List row | `bg-surface hover:bg-surface-hover transition-smooth`  |
 | Link     | `text-accent-text hover:text-accent transition-smooth` |
