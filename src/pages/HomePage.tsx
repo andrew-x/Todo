@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useAuth } from '@/components/auth/AuthProvider'
 import SegmentedControl, {
@@ -12,6 +12,7 @@ import CompletedView from '@/components/views/CompletedView'
 import ViewSwitcher, { type View } from '@/components/views/ViewSwitcher'
 import WeekView from '@/components/views/WeekView'
 import WorkView from '@/components/views/WorkView'
+import logger from '@/lib/logger'
 import type { Task } from '@/lib/types'
 import {
   useGetProfileQuery,
@@ -40,6 +41,20 @@ export default function HomePage() {
   const [activeView, setActiveView] = useState<View>('work')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [mutationError, setMutationError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!mutationError) return
+    const timer = setTimeout(() => setMutationError(null), 5000)
+    return () => clearTimeout(timer)
+  }, [mutationError])
+
+  function handleMutationError(action: string) {
+    return (e: unknown) => {
+      logger.error(`${action} failed`, e)
+      setMutationError(`Failed to ${action}. Please try again.`)
+    }
+  }
 
   const categoryOptions: Option<string>[] = [
     { value: 'all', label: 'All' },
@@ -62,6 +77,8 @@ export default function HomePage() {
 
   function handleAdd(data: TaskCreationData) {
     createTask({ userId, ...data })
+      .unwrap()
+      .catch(handleMutationError('create task'))
 
     // Add any new categories to the user's profile
     if (profile) {
@@ -75,16 +92,22 @@ export default function HomePage() {
           userId,
           categories: [...profile.categories, newCategory],
         })
+          .unwrap()
+          .catch(handleMutationError('update categories'))
       }
     }
   }
 
   function handleUpdate(id: string, updates: Partial<Task>) {
     updateTask({ userId, id, ...updates })
+      .unwrap()
+      .catch(handleMutationError('update task'))
   }
 
   function handleDelete(id: string) {
     deleteTask({ userId, id })
+      .unwrap()
+      .catch(handleMutationError('delete task'))
   }
 
   function handleBatchUpdate(
@@ -95,6 +118,8 @@ export default function HomePage() {
     >,
   ) {
     batchUpdateTasks({ userId, updates })
+      .unwrap()
+      .catch(handleMutationError('update tasks'))
   }
 
   function handleEdit(task: Task) {
@@ -103,6 +128,8 @@ export default function HomePage() {
 
   function handleEditSave(updates: Partial<Task>) {
     updateTask({ userId, id: editingTask!.id, ...updates })
+      .unwrap()
+      .catch(handleMutationError('update task'))
 
     if (profile && updates.category) {
       const isNew = !profile.categories.includes(updates.category)
@@ -111,6 +138,8 @@ export default function HomePage() {
           userId,
           categories: [...profile.categories, updates.category],
         })
+          .unwrap()
+          .catch(handleMutationError('update categories'))
       }
     }
 
@@ -119,6 +148,8 @@ export default function HomePage() {
 
   function handleEditDelete() {
     deleteTask({ userId, id: editingTask!.id })
+      .unwrap()
+      .catch(handleMutationError('delete task'))
     setEditingTask(null)
   }
 
@@ -146,6 +177,18 @@ export default function HomePage() {
               {errorDetail}
             </pre>
           )}
+        </div>
+      )}
+      {mutationError && (
+        <div className="bg-error-subtle flex items-center justify-between rounded-md px-4 py-3 text-sm">
+          <p className="text-error font-medium">{mutationError}</p>
+          <button
+            onClick={() => setMutationError(null)}
+            className="text-error/70 hover:text-error ml-4 text-lg leading-none"
+            aria-label="Dismiss error"
+          >
+            &times;
+          </button>
         </div>
       )}
 

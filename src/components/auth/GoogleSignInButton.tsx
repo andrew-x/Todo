@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { useAuth } from '@/components/auth/AuthProvider'
 import Button from '@/components/common/Button'
+import logger from '@/lib/logger'
 
 export default function GoogleSignInButton() {
   const { signInWithGoogle } = useAuth()
@@ -13,7 +14,8 @@ export default function GoogleSignInButton() {
     setIsLoading(true)
     try {
       await signInWithGoogle()
-    } catch {
+    } catch (e) {
+      logger.error('Sign-in failed', e)
       setError('Sign-in failed. Please try again.')
     } finally {
       setIsLoading(false)

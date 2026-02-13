@@ -208,6 +208,20 @@ const todosApi = api.injectEndpoints({
           return { error: toFirestoreError(e) }
         }
       },
+      async onQueryStarted(
+        { userId, id, ...patch },
+        { dispatch, queryFulfilled },
+      ) {
+        const patchResult = dispatch(
+          todosApi.util.updateQueryData('listActiveTasks', userId, (draft) => {
+            const task = draft.find((t) => t.id === id)
+            if (task) {
+              Object.assign(task, patch, { updatedAt: dayjs().valueOf() })
+            }
+          }),
+        )
+        queryFulfilled.catch(patchResult.undo)
+      },
       invalidatesTags: (_result, _error, arg) => {
         const tags: { type: 'Task'; id: string }[] = [
           { type: 'Task', id: arg.id },

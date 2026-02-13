@@ -76,10 +76,12 @@ export default function EditTaskModal({
     const category = data.category || null
     if (category !== task.category) updates.category = category
 
-    const priority = (data.priority || null) as Priority | null
+    const priority: Priority | null =
+      PRIORITIES.find((p) => p === data.priority) ?? null
     if (priority !== task.priority) updates.priority = priority
 
-    const queue = (data.queue || null) as Task['queue']
+    const queue: Task['queue'] =
+      data.queue === 'day' || data.queue === 'week' ? data.queue : null
     if (queue !== task.queue) updates.queue = queue
 
     const dueDate = data.dueDate || null

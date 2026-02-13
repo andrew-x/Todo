@@ -56,6 +56,7 @@ export default function CompletedView({
 
   const tasksRef = useRef(tasks)
   tasksRef.current = tasks
+  const isLoadingMoreRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -83,8 +84,14 @@ export default function CompletedView({
   }, [trigger, userId])
 
   const handleLoadMore = useCallback(async () => {
+    if (isLoadingMoreRef.current) return
+    isLoadingMoreRef.current = true
+
     const lastTask = tasksRef.current[tasksRef.current.length - 1]
-    if (!lastTask) return
+    if (!lastTask) {
+      isLoadingMoreRef.current = false
+      return
+    }
 
     try {
       const result = await trigger({
@@ -96,6 +103,8 @@ export default function CompletedView({
       setHasMore(result.hasMore)
     } catch (e) {
       logger.error('Failed to load more completed tasks', e)
+    } finally {
+      isLoadingMoreRef.current = false
     }
   }, [trigger, userId])
 
