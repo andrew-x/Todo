@@ -16,6 +16,7 @@ const pillVariants = cva(
         error: 'bg-error-subtle text-error',
       },
       size: {
+        xs: 'h-5 gap-0.5 rounded-sm px-1.5 text-[11px]',
         sm: 'h-6 gap-1 rounded-sm px-2 text-xs',
         md: 'h-7 gap-1.5 rounded px-2.5 text-xs',
       },

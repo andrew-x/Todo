@@ -13,14 +13,14 @@ RTK Query was chosen over a raw Firestore SDK approach because it provides a nor
 
 ## File Locations
 
-| File                      | Purpose                                                         |
-| ------------------------- | --------------------------------------------------------------- |
-| `src/store/api.ts`        | Central RTK Query API slice (`createApi` call)                  |
-| `src/store/store.ts`      | Redux store configuration, type exports                         |
-| `src/store/hooks.ts`      | Typed `useAppDispatch` and `useAppSelector` hooks               |
-| `src/store/todosApi.ts`   | Todo/Task endpoints (queries + mutations via `injectEndpoints`) |
+| File                      | Purpose                                                            |
+| ------------------------- | ------------------------------------------------------------------ |
+| `src/store/api.ts`        | Central RTK Query API slice (`createApi` call)                     |
+| `src/store/store.ts`      | Redux store configuration, type exports                            |
+| `src/store/hooks.ts`      | Typed `useAppDispatch` and `useAppSelector` hooks                  |
+| `src/store/todosApi.ts`   | Todo/Task endpoints (queries + mutations via `injectEndpoints`)    |
 | `src/store/profileApi.ts` | User Profile endpoints (queries + mutations via `injectEndpoints`) |
-| `src/main.tsx`            | `<Provider store={store}>` wrapping the app                     |
+| `src/main.tsx`            | `<Provider store={store}>` wrapping the app                        |
 
 Feature endpoint files follow the convention `*Api.ts` and live in `src/store/` alongside the core store files (e.g., `src/store/todosApi.ts`). This keeps all app state -- store config, API slice, and endpoints -- in one place.
 

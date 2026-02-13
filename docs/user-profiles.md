@@ -8,27 +8,27 @@ Each user has a single profile document that persists across sessions. The profi
 
 ## Key Files
 
-| File                        | Role                                                                                            |
-| --------------------------- | ----------------------------------------------------------------------------------------------- |
-| `src/store/profileApi.ts`   | RTK Query endpoints -- `getProfile`, `updateProfile`                                            |
-| `src/store/api.ts`          | Central API slice with `'Profile'` cache tag                                                    |
-| `src/lib/types.ts`          | `Profile` type definition                                                                       |
-| `src/pages/HomePage.tsx`    | Fetches user profile, passes suggestions to form, auto-updates profile on task creation         |
-| `src/components/settings/SettingsModal.tsx` | User interface for viewing and managing profile categories (add/delete)                |
-| `src/App.tsx`               | Settings button in header opens `SettingsModal` when authenticated                              |
-| `src/components/task-editor/SmartInput/SmartInput.tsx` | Accepts `suggestedCategories` prop, wires it to suggestion factory |
-| `src/components/task-editor/SmartInput/suggestions/CategorySuggestion.ts` | Factory function returning profile categories only     |
+| File                                                                      | Role                                                                                    |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `src/store/profileApi.ts`                                                 | RTK Query endpoints -- `getProfile`, `updateProfile`                                    |
+| `src/store/api.ts`                                                        | Central API slice with `'Profile'` cache tag                                            |
+| `src/lib/types.ts`                                                        | `Profile` type definition                                                               |
+| `src/pages/HomePage.tsx`                                                  | Fetches user profile, passes suggestions to form, auto-updates profile on task creation |
+| `src/components/settings/SettingsModal.tsx`                               | User interface for viewing and managing profile categories (add/delete)                 |
+| `src/App.tsx`                                                             | Settings button in header opens `SettingsModal` when authenticated                      |
+| `src/components/task-editor/SmartInput/SmartInput.tsx`                    | Accepts `suggestedCategories` prop, wires it to suggestion factory                      |
+| `src/components/task-editor/SmartInput/suggestions/CategorySuggestion.ts` | Factory function returning profile categories only                                      |
 
 ## Profile Data Model
 
 The `Profile` type is defined in `src/lib/types.ts`:
 
-| Field        | Type       | Description                                            |
-| ------------ | ---------- | ------------------------------------------------------ |
-| `id`         | `string`   | User ID (Firebase Auth UID)                            |
+| Field        | Type       | Description                                                      |
+| ------------ | ---------- | ---------------------------------------------------------------- |
+| `id`         | `string`   | User ID (Firebase Auth UID)                                      |
 | `categories` | `string[]` | Array of categories the user has created (in order of first use) |
-| `createdAt`  | `number`   | Timestamp in milliseconds                              |
-| `updatedAt`  | `number`   | Timestamp in milliseconds                              |
+| `createdAt`  | `number`   | Timestamp in milliseconds                                        |
+| `updatedAt`  | `number`   | Timestamp in milliseconds                                        |
 
 ## How It Works
 
@@ -160,6 +160,7 @@ All endpoints are defined in `src/store/profileApi.ts` using `api.injectEndpoint
 **Returns:** `Profile`
 
 **Firestore Operation:**
+
 1. Attempts `getDoc(doc(db, 'users', userId))`
 2. If document exists, returns it as `Profile`
 3. If document does not exist, creates a default profile with empty arrays and returns it
@@ -167,6 +168,7 @@ All endpoints are defined in `src/store/profileApi.ts` using `api.injectEndpoint
 **Cache Tags:** Provides `{ type: 'Profile', id: userId }`
 
 **Usage:**
+
 ```ts
 const { data: profile, isLoading } = useGetProfileQuery(userId)
 ```
@@ -182,6 +184,7 @@ const { data: profile, isLoading } = useGetProfileQuery(userId)
 **Returns:** `void`
 
 **Firestore Operation:**
+
 1. Calls `updateDoc(doc(db, 'users', userId), { ...patch, updatedAt: dayjs().valueOf() })`
 2. Auto-sets `updatedAt` field to current timestamp
 3. Only patches the fields provided -- does not overwrite the entire document
@@ -189,6 +192,7 @@ const { data: profile, isLoading } = useGetProfileQuery(userId)
 **Cache Tags:** Invalidates `{ type: 'Profile', id: userId }`
 
 **Usage:**
+
 ```ts
 const [updateProfile] = useUpdateProfileMutation()
 

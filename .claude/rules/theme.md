@@ -61,14 +61,14 @@ Never use raw Tailwind color classes (e.g., `bg-zinc-900`, `text-gray-500`). Alw
 
 ## Custom Utility Classes (`src/styles/utilities.css`)
 
-| Class               | Expands to                                              | Use case                        |
-| ------------------- | ------------------------------------------------------- | ------------------------------- |
-| `center-all`        | `flex items-center justify-center`                      | Center children both axes       |
-| `center-col`        | `flex flex-col items-center justify-center`             | Centered vertical stack         |
-| `center-row`        | `flex flex-row items-center justify-center`             | Centered horizontal row         |
-| `stack`             | `flex flex-col`                                         | Vertical flex container         |
-| `transition-smooth` | `transition-colors duration-150 ease-smooth`            | Standard interactive transition |
-| `focus-ring`        | Focus-visible ring with `bg-base` offset + `ring` color | Standard focus indicator        |
+| Class               | Expands to                                              | Use case                           |
+| ------------------- | ------------------------------------------------------- | ---------------------------------- |
+| `center-all`        | `flex items-center justify-center`                      | Center children both axes          |
+| `center-col`        | `flex flex-col items-center justify-center`             | Centered vertical stack            |
+| `center-row`        | `flex flex-row items-center justify-center`             | Centered horizontal row            |
+| `stack`             | `flex flex-col`                                         | Vertical flex container            |
+| `transition-smooth` | `transition-colors duration-150 ease-smooth`            | Standard interactive transition    |
+| `focus-ring`        | Focus-visible ring with `bg-base` offset + `ring` color | Standard focus indicator           |
 | `tooltip`           | `::after` pseudo-element from `data-tooltip` attr       | Hover/focus tooltip on any element |
 
 ## Transitions
@@ -85,16 +85,16 @@ Standard focus style: `focus-ring` (replaces `focus-visible:outline-none focus-v
 
 **Use design system components** (`src/components/common/`) instead of hand-rolling these:
 
-| Need                        | Component                                                    |
-| --------------------------- | ------------------------------------------------------------ |
-| Button (any variant)        | `<Button>` — supports `variant`, `size`, `isLoading`, `href` |
+| Need                        | Component                                                                            |
+| --------------------------- | ------------------------------------------------------------------------------------ |
+| Button (any variant)        | `<Button>` — supports `variant`, `size`, `isLoading`, `href`                         |
 | Icon-only button            | `<IconButton>` — square sizing, required `label` (tooltip + aria-label), `isLoading` |
-| Text input with label/error | `<TextInput>`                                                |
-| Textarea with label/error   | `<TextArea>`                                                 |
-| Tag / badge / pill          | `<Pill>` — supports `color`, `size`, `onRemove`              |
-| Multi-value tag input       | `<PillInput>`                                                |
-| Dropdown select             | `<Select>` — supports `options`, `size`, `placeholder`       |
-| Modal / dialog              | `<Modal>` — supports `size`, `title`, `footer`, `open`/`onClose` |
+| Text input with label/error | `<TextInput>`                                                                        |
+| Textarea with label/error   | `<TextArea>`                                                                         |
+| Tag / badge / pill          | `<Pill>` — supports `color`, `size`, `onRemove`                                      |
+| Multi-value tag input       | `<PillInput>`                                                                        |
+| Dropdown select             | `<Select>` — supports `options`, `size`, `placeholder`                               |
+| Modal / dialog              | `<Modal>` — supports `size`, `title`, `footer`, `open`/`onClose`                     |
 
 For elements without a component, use semantic tokens directly:
 

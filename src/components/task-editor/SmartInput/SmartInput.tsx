@@ -7,7 +7,13 @@ import Text from '@tiptap/extension-text'
 import { PluginKey } from '@tiptap/pm/state'
 import { EditorContent, useEditor } from '@tiptap/react'
 import Suggestion from '@tiptap/suggestion'
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  type RefObject,
+} from 'react'
 
 import cn from '@/lib/classnames'
 import { extractFieldsFromText } from '@/lib/tokenRegistry'
@@ -24,18 +30,20 @@ const EMPTY_FIELDS: ParsedTaskFields = {
   dueDate: null,
 }
 
-/** Update keyboard shortcut callbacks in Tiptap extensionStorage. */
+/** Update keyboard shortcut callbacks and refs in Tiptap extensionStorage. */
 function syncCallbacks(
   editor: Editor,
   callbacks: {
     onSubmit: () => void
     onFieldsChange: (f: ParsedTaskFields) => void
   },
+  detectionEnabledRef: RefObject<boolean>,
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const storage = (editor.extensionStorage as any).keyboardShortcuts
   storage.onSubmit = callbacks.onSubmit
   storage.onFieldsChange = callbacks.onFieldsChange
+  storage.detectionEnabledRef = detectionEnabledRef
 }
 
 type SmartInputProps = {
@@ -64,7 +72,7 @@ const KeyboardShortcutsExtension = Extension.create({
   addStorage() {
     return {
       onSubmit: () => {},
-      onFieldsChange: (_: ParsedTaskFields) => {},
+      onFieldsChange: () => {},
       detectionEnabledRef: { current: true } as { current: boolean },
     }
   },
@@ -135,6 +143,8 @@ const SmartInput = forwardRef<SmartInputRef, SmartInputProps>(
       categoriesRef.current = suggestedCategories
     }, [suggestedCategories])
 
+    // Refs are captured by ProseMirror plugin closures, not read during render.
+    /* eslint-disable react-hooks/refs */
     const editor = useEditor({
       extensions: [
         Document,
@@ -147,6 +157,7 @@ const SmartInput = forwardRef<SmartInputRef, SmartInputProps>(
         KeyboardShortcutsExtension,
         createCategorySuggestionExtension(() => categoriesRef.current),
       ],
+      /* eslint-enable react-hooks/refs */
       editorProps: {
         attributes: {
           class: 'outline-none',
@@ -164,10 +175,7 @@ const SmartInput = forwardRef<SmartInputRef, SmartInputProps>(
     // Keep callbacks and the detection ref in extensionStorage up to date
     useEffect(() => {
       if (editor) {
-        syncCallbacks(editor, { onSubmit, onFieldsChange })
-        ;(
-          editor.extensionStorage as any
-        ).keyboardShortcuts.detectionEnabledRef = detectionEnabledRef
+        syncCallbacks(editor, { onSubmit, onFieldsChange }, detectionEnabledRef)
       }
     })
 

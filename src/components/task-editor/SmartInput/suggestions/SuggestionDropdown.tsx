@@ -2,18 +2,13 @@ import { forwardRef, useImperativeHandle, useState } from 'react'
 
 import cn from '@/lib/classnames'
 
-type SuggestionDropdownProps = {
-  items: string[]
-  command: (item: string) => void
-}
-
 export type SuggestionDropdownRef = {
   onKeyDown: (props: { event: KeyboardEvent }) => boolean
 }
 
 const SuggestionDropdown = forwardRef<
   SuggestionDropdownRef,
-  SuggestionDropdownProps
+  { items: string[]; command: (item: string) => void }
 >(({ items, command }, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [prevItems, setPrevItems] = useState(items)

@@ -80,3 +80,11 @@
     opacity: 1;
   }
 }
+
+@utility tooltip-end {
+  &::after {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+}

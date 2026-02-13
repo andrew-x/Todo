@@ -10,21 +10,17 @@ import SegmentedControl, {
 
 export type View = 'work' | 'week' | 'completed'
 
-export type ViewSwitcherProps = {
-  activeView: View
-  onViewChange: (view: View) => void
-}
-
 const VIEWS: Option<View>[] = [
   { value: 'work', label: 'Work', icon: ListBulletsIcon },
   { value: 'week', label: 'Week', icon: CalendarDotsIcon },
   { value: 'completed', label: 'Completed', icon: CheckCircleIcon },
 ]
 
-export default function ViewSwitcher({
-  activeView,
-  onViewChange,
-}: ViewSwitcherProps) {
+export default function ViewSwitcher(props: {
+  activeView: View
+  onViewChange: (view: View) => void
+}) {
+  const { activeView, onViewChange } = props
   return (
     <SegmentedControl
       options={VIEWS}

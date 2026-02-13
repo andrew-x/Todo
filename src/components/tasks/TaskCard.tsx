@@ -26,7 +26,7 @@ const PRIORITY_COLORS: Record<Priority, Color> = {
   'P0 - Critical': 'error',
   'P1 - Important': 'warning',
   'P2 - Standard': 'secondary',
-  'P3 - Optional': 'default',
+  'P3 - Optional': 'success',
   'P4 - Later': 'default',
 }
 
@@ -46,7 +46,7 @@ export default function TaskCard(props: TaskCardProps) {
   return (
     <div
       className={cn(
-        'group border-border-default bg-bg-raised flex items-stretch gap-3 rounded-md border p-3',
+        'group border-border-default bg-bg-raised flex items-stretch gap-2 rounded-md border p-2',
         isDragging && 'border-dashed opacity-50',
         className,
       )}
@@ -54,12 +54,12 @@ export default function TaskCard(props: TaskCardProps) {
       {dragHandleListeners && (
         <button
           type="button"
-          className="text-text-tertiary transition-smooth hover:text-text-secondary flex shrink-0 cursor-grab items-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
+          className="text-text-tertiary transition-smooth hover:bg-surface-hover hover:text-text-secondary -my-2 -ml-2 flex w-5 shrink-0 cursor-grab items-center justify-center rounded-l-[5px] opacity-0 group-hover:opacity-100 focus-visible:opacity-100 active:cursor-grabbing"
           aria-label="Drag to reorder"
           {...dragHandleListeners}
           {...dragHandleAttributes}
         >
-          <DotsSixVerticalIcon size={20} />
+          <DotsSixVerticalIcon size={14} />
         </button>
       )}
 
@@ -71,7 +71,7 @@ export default function TaskCard(props: TaskCardProps) {
         className="accent-accent h-4 w-4 shrink-0 cursor-pointer self-center rounded"
       />
 
-      <div className="min-w-0 flex-1">
+      <div className="ml-0.5 min-w-0 flex-1">
         <p
           className={cn(
             'text-text-primary text-sm',
@@ -88,16 +88,16 @@ export default function TaskCard(props: TaskCardProps) {
         )}
 
         {hasMetadata && (
-          <div className="border-border-default mt-2 flex items-center justify-between gap-1.5 border-t pt-2">
+          <div className="mt-1.5 flex items-center justify-between gap-1.5">
             {task.category && (
-              <p className="text-text-secondary flex items-center gap-2 text-sm">
-                <TagIcon size={14} /> {task.category}
+              <p className="text-text-secondary flex items-center gap-1 text-xs">
+                <TagIcon size={12} /> {task.category}
               </p>
             )}
             {task.priority && (
               <Pill
                 className="ml-auto"
-                size="sm"
+                size="xs"
                 color={PRIORITY_COLORS[task.priority]}
               >
                 {task.priority.slice(0, 2)}
@@ -112,7 +112,7 @@ export default function TaskCard(props: TaskCardProps) {
         size="xs"
         label="Edit task"
         onClick={onEdit}
-        className="shrink-0 self-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+        className="tooltip-end shrink-0 self-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
       >
         <PencilSimpleIcon size={16} />
       </IconButton>

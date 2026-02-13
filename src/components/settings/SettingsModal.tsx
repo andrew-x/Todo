@@ -9,17 +9,12 @@ import {
   useUpdateProfileMutation,
 } from '@/store/profileApi'
 
-export type SettingsModalProps = {
+export default function SettingsModal(props: {
   userId: string
   open: boolean
   onClose: () => void
-}
-
-export default function SettingsModal({
-  userId,
-  open,
-  onClose,
-}: SettingsModalProps) {
+}) {
+  const { userId, open, onClose } = props
   const { data: profile } = useGetProfileQuery(userId)
   const [updateProfile] = useUpdateProfileMutation()
   const [newCategory, setNewCategory] = useState('')

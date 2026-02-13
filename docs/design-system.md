@@ -90,13 +90,13 @@ A square button for icon-only actions. Uses the same variant system as Button bu
 
 **Props:**
 
-| Prop        | Type                                                                    | Default     | Description                                                                                    |
-| ----------- | ----------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| `variant`   | `'default' \| 'primary' \| 'danger' \| 'outline' \| 'ghost' \| 'link'` | `'default'` | Visual style (same variants as Button)                                                         |
-| `size`      | `Size`                                                                  | `'md'`      | Size from the shared scale                                                                     |
-| `label`     | `string`                                                                | --          | **Required.** Sets both `aria-label` and `data-tooltip` for accessibility and hover tooltips  |
-| `isLoading` | `boolean`                                                               | `false`     | Shows a spinner (`CircleNotchIcon` from Phosphor Icons), disables the button, and sets `aria-busy` |
-| `className` | `string`                                                                | --          | Additional classes (merged last)                                                               |
+| Prop        | Type                                                                   | Default     | Description                                                                                        |
+| ----------- | ---------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `variant`   | `'default' \| 'primary' \| 'danger' \| 'outline' \| 'ghost' \| 'link'` | `'default'` | Visual style (same variants as Button)                                                             |
+| `size`      | `Size`                                                                 | `'md'`      | Size from the shared scale                                                                         |
+| `label`     | `string`                                                               | --          | **Required.** Sets both `aria-label` and `data-tooltip` for accessibility and hover tooltips       |
+| `isLoading` | `boolean`                                                              | `false`     | Shows a spinner (`CircleNotchIcon` from Phosphor Icons), disables the button, and sets `aria-busy` |
+| `className` | `string`                                                               | --          | Additional classes (merged last)                                                                   |
 
 Plus all native `<button>` attributes except `aria-label` (which is overridden by the `label` prop).
 
@@ -215,14 +215,14 @@ A styled native `<select>` dropdown with a custom caret icon. Wraps the native e
 
 **Props:**
 
-| Prop          | Type              | Default | Description                                                    |
-| ------------- | ----------------- | ------- | -------------------------------------------------------------- |
-| `size`        | `Size`            | `'md'`  | Size from the shared scale                                     |
-| `options`     | `SelectOption[]`  | --      | Array of `{ value: string; label: string }` objects            |
-| `placeholder` | `string`          | --      | When provided, renders a disabled placeholder `<option>`       |
-| `label`       | `string`          | --      | Renders a `<label>` above the select, linked via `htmlFor`/`id`|
-| `error`       | `string`          | --      | Renders an error message below the select, adds `border-error` |
-| `className`   | `string`          | --      | Applied to the wrapper `<div>`, not the select itself          |
+| Prop          | Type             | Default | Description                                                     |
+| ------------- | ---------------- | ------- | --------------------------------------------------------------- |
+| `size`        | `Size`           | `'md'`  | Size from the shared scale                                      |
+| `options`     | `SelectOption[]` | --      | Array of `{ value: string; label: string }` objects             |
+| `placeholder` | `string`         | --      | When provided, renders a disabled placeholder `<option>`        |
+| `label`       | `string`         | --      | Renders a `<label>` above the select, linked via `htmlFor`/`id` |
+| `error`       | `string`         | --      | Renders an error message below the select, adds `border-error`  |
+| `className`   | `string`         | --      | Applied to the wrapper `<div>`, not the select itself           |
 
 Plus all native `<select>` attributes except `size` (which is overridden by the CVA size variant).
 
@@ -243,16 +243,16 @@ An autocomplete/combobox-style text input that shows filtered suggestions in a d
 
 **Props:**
 
-| Prop          | Type                      | Default | Description                                                        |
-| ------------- | ------------------------- | ------- | ------------------------------------------------------------------ |
-| `size`        | `Size`                    | `'md'`  | Size from the shared scale                                         |
-| `suggestions` | `string[]`                | --      | Full list of suggestions; component filters internally             |
-| `onSelect`    | `(value: string) => void` | --      | Callback fired when a suggestion is picked (keyboard or click)     |
-| `value`       | `string`                  | --      | Controlled value (when provided, component is controlled)          |
-| `onChange`     | input change handler      | --      | Standard input onChange; works in both controlled and uncontrolled modes |
-| `label`       | `string`                  | --      | Renders a `<label>` above the input, linked via `htmlFor`/`id`    |
-| `error`       | `string`                  | --      | Renders an error message below the input, adds `border-error`     |
-| `className`   | `string`                  | --      | Applied to the wrapper `<div>`, not the input itself              |
+| Prop          | Type                      | Default | Description                                                              |
+| ------------- | ------------------------- | ------- | ------------------------------------------------------------------------ |
+| `size`        | `Size`                    | `'md'`  | Size from the shared scale                                               |
+| `suggestions` | `string[]`                | --      | Full list of suggestions; component filters internally                   |
+| `onSelect`    | `(value: string) => void` | --      | Callback fired when a suggestion is picked (keyboard or click)           |
+| `value`       | `string`                  | --      | Controlled value (when provided, component is controlled)                |
+| `onChange`    | input change handler      | --      | Standard input onChange; works in both controlled and uncontrolled modes |
+| `label`       | `string`                  | --      | Renders a `<label>` above the input, linked via `htmlFor`/`id`           |
+| `error`       | `string`                  | --      | Renders an error message below the input, adds `border-error`            |
+| `className`   | `string`                  | --      | Applied to the wrapper `<div>`, not the input itself                     |
 
 Plus all native `<input>` attributes except `size` (which is overridden by the CVA size variant).
 
@@ -264,12 +264,12 @@ Plus all native `<input>` attributes except `size` (which is overridden by the C
 
 **Keyboard navigation:**
 
-| Key        | Action                                                  |
-| ---------- | ------------------------------------------------------- |
-| Arrow Down | Open dropdown (if closed) or move to next suggestion    |
-| Arrow Up   | Move to previous suggestion (wraps around)              |
-| Enter      | Select the highlighted suggestion                       |
-| Escape     | Close the dropdown                                      |
+| Key        | Action                                               |
+| ---------- | ---------------------------------------------------- |
+| Arrow Down | Open dropdown (if closed) or move to next suggestion |
+| Arrow Up   | Move to previous suggestion (wraps around)           |
+| Enter      | Select the highlighted suggestion                    |
+| Escape     | Close the dropdown                                   |
 
 Arrow navigation wraps around -- pressing Down on the last item moves to the first, and pressing Up on the first moves to the last.
 
@@ -361,15 +361,15 @@ A dialog overlay rendered via `createPortal` to `document.body`. Supports an opt
 
 **Props:**
 
-| Prop        | Type                       | Default | Description                                              |
-| ----------- | -------------------------- | ------- | -------------------------------------------------------- |
-| `open`      | `boolean`                  | --      | Controls visibility (when `false`, renders nothing)      |
-| `onClose`   | `() => void`               | --      | Called on backdrop click, Escape key, or X button click  |
-| `title`     | `string`                   | --      | When provided, renders a header with the title and an X close button |
-| `footer`    | `React.ReactNode`          | --      | When provided, renders a right-aligned footer area       |
-| `size`      | `'sm' \| 'md' \| 'lg'`     | `'md'`  | Panel max-width                                          |
-| `children`  | `React.ReactNode`          | --      | Body content                                             |
-| `className` | `string`                   | --      | Additional classes applied to the panel (merged last)    |
+| Prop        | Type                   | Default | Description                                                          |
+| ----------- | ---------------------- | ------- | -------------------------------------------------------------------- |
+| `open`      | `boolean`              | --      | Controls visibility (when `false`, renders nothing)                  |
+| `onClose`   | `() => void`           | --      | Called on backdrop click, Escape key, or X button click              |
+| `title`     | `string`               | --      | When provided, renders a header with the title and an X close button |
+| `footer`    | `React.ReactNode`      | --      | When provided, renders a right-aligned footer area                   |
+| `size`      | `'sm' \| 'md' \| 'lg'` | `'md'`  | Panel max-width                                                      |
+| `children`  | `React.ReactNode`      | --      | Body content                                                         |
+| `className` | `string`               | --      | Additional classes applied to the panel (merged last)                |
 
 **Size variants:**
 

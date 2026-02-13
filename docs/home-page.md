@@ -8,52 +8,52 @@ After signing in, the user lands on the Home page. The page fetches all **active
 
 ## Key Files
 
-| File                                                                | Role                                                                                           |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `src/pages/HomePage.tsx`                                            | Page component -- fetches tasks + profile, wires up mutations, manages active view, auto-updates profile on task creation |
-| `src/components/task-editor/TaskCreationForm.tsx`                          | Form wrapper -- SmartInput + expandable manual fields, merges parsed and manual data on submit |
-| `src/components/task-editor/SmartInput/SmartInput.tsx`                     | Tiptap editor wrapper -- keyboard handling, extension setup, imperative ref, accepts suggested categories |
-| `src/components/task-editor/SmartInput/marks/DateMark.ts`                  | ProseMirror plugin for natural language date highlighting (chrono-node)                        |
-| `src/components/task-editor/SmartInput/marks/PriorityMark.ts`              | ProseMirror plugin for `P0`–`P4` priority token highlighting                                    |
-| `src/components/task-editor/SmartInput/marks/CategoryMark.ts`              | Tiptap mark extension for `@category` tokens                                                   |
-| `src/components/task-editor/SmartInput/suggestions/CategorySuggestion.ts`  | Suggestion factory for `@` trigger -- returns profile categories only                          |
-| `src/components/task-editor/SmartInput/suggestions/SuggestionDropdown.tsx` | Shared dropdown UI for autocomplete popups                                                     |
-| `src/components/task-editor/SmartInput/suggestions/renderSuggestion.tsx`   | Tiptap suggestion render bridge (creates a portal-based dropdown)                              |
-| `src/components/task-editor/EditTaskModal.tsx`                             | Modal form for editing all task properties (zod + react-hook-form + delete confirmation)       |
-| `src/components/settings/SettingsModal.tsx`                                | Settings modal for viewing and managing profile categories (add/delete)                        |
-| `src/lib/tokenRegistry.ts`                                          | Token config array, `extractFieldsFromText()`, `getCleanTitle()`, color mappings               |
-| `src/lib/types.ts`                                                  | `Task` and `ParsedTaskFields` type definitions                                                 |
-| `src/components/tasks/TaskCard.tsx`                                  | Interactive task card -- checkbox, edit button, drag handle                                    |
-| `src/components/tasks/TaskColumn.tsx`                                | Dual-mode column: static (WeekView) or DnD-enabled (WorkView via `groups` prop); includes `DoneSection` for completed tasks |
-| `src/components/tasks/SortableTaskCard.tsx`                          | Wraps TaskCard with dnd-kit's `useSortable` hook for drag-and-drop reordering                 |
-| `src/components/tasks/SortableGroup.tsx`                             | `useDroppable` + `SortableContext` wrapper for priority groups within a column                 |
-| `src/lib/dnd.ts`                                                    | Container ID builders/parsers, task sorting by order, container map for multi-container DnD    |
-| `src/components/tasks/UnscheduledSection.tsx`                        | Collapsible section for tasks with no due date                                                 |
-| `src/components/views/ViewSwitcher.tsx`                              | Segmented control to switch between Work / Week / Completed views                              |
-| `src/components/views/WorkView.tsx`                                  | 3-column kanban with drag-and-drop (DndContext, sensors, drag state, batch updates)            |
-| `src/components/views/WeekView.tsx`                                  | 7-day columns (Mon-Sun) filtered by `dueDate`                                                 |
-| `src/components/views/CompletedView.tsx`                             | Searchable flat list of all completed tasks with cursor-based pagination                       |
-| `src/store/todosApi.ts`                                             | RTK Query endpoints -- `listActiveTasks`, `listInactiveTasks`, `listCompletedTasks`, `createTask`, `updateTask`, `deleteTask`, `batchUpdateTasks` |
-| `src/lib/dayjs.ts`                                                  | Date utilities -- `getWeekDays()`, `getMonthGrid()`, `isToday()`                               |
+| File                                                                       | Role                                                                                                                                              |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/pages/HomePage.tsx`                                                   | Page component -- fetches tasks + profile, wires up mutations, manages active view, auto-updates profile on task creation                         |
+| `src/components/task-editor/TaskCreationForm.tsx`                          | Form wrapper -- SmartInput + expandable manual fields, merges parsed and manual data on submit                                                    |
+| `src/components/task-editor/SmartInput/SmartInput.tsx`                     | Tiptap editor wrapper -- keyboard handling, extension setup, imperative ref, accepts suggested categories                                         |
+| `src/components/task-editor/SmartInput/marks/DateMark.ts`                  | ProseMirror plugin for natural language date highlighting (chrono-node)                                                                           |
+| `src/components/task-editor/SmartInput/marks/PriorityMark.ts`              | ProseMirror plugin for `P0`–`P4` priority token highlighting                                                                                      |
+| `src/components/task-editor/SmartInput/marks/CategoryMark.ts`              | Tiptap mark extension for `@category` tokens                                                                                                      |
+| `src/components/task-editor/SmartInput/suggestions/CategorySuggestion.ts`  | Suggestion factory for `@` trigger -- returns profile categories only                                                                             |
+| `src/components/task-editor/SmartInput/suggestions/SuggestionDropdown.tsx` | Shared dropdown UI for autocomplete popups                                                                                                        |
+| `src/components/task-editor/SmartInput/suggestions/renderSuggestion.tsx`   | Tiptap suggestion render bridge (creates a portal-based dropdown)                                                                                 |
+| `src/components/task-editor/EditTaskModal.tsx`                             | Modal form for editing all task properties (zod + react-hook-form + delete confirmation)                                                          |
+| `src/components/settings/SettingsModal.tsx`                                | Settings modal for viewing and managing profile categories (add/delete)                                                                           |
+| `src/lib/tokenRegistry.ts`                                                 | Token config array, `extractFieldsFromText()`, `getCleanTitle()`, color mappings                                                                  |
+| `src/lib/types.ts`                                                         | `Task` and `ParsedTaskFields` type definitions                                                                                                    |
+| `src/components/tasks/TaskCard.tsx`                                        | Interactive task card -- checkbox, edit button, drag handle                                                                                       |
+| `src/components/tasks/TaskColumn.tsx`                                      | Dual-mode column: static (WeekView) or DnD-enabled (WorkView via `groups` prop); includes `DoneSection` for completed tasks                       |
+| `src/components/tasks/SortableTaskCard.tsx`                                | Wraps TaskCard with dnd-kit's `useSortable` hook for drag-and-drop reordering                                                                     |
+| `src/components/tasks/SortableGroup.tsx`                                   | `useDroppable` + `SortableContext` wrapper for priority groups within a column                                                                    |
+| `src/lib/dnd.ts`                                                           | Container ID builders/parsers, task sorting by order, container map for multi-container DnD                                                       |
+| `src/components/tasks/UnscheduledSection.tsx`                              | Collapsible section for tasks with no due date                                                                                                    |
+| `src/components/views/ViewSwitcher.tsx`                                    | Segmented control to switch between Work / Week / Completed views                                                                                 |
+| `src/components/views/WorkView.tsx`                                        | 3-column kanban with drag-and-drop (DndContext, sensors, drag state, batch updates)                                                               |
+| `src/components/views/WeekView.tsx`                                        | 7-day columns (Mon-Sun) filtered by `dueDate`                                                                                                     |
+| `src/components/views/CompletedView.tsx`                                   | Searchable flat list of all completed tasks with cursor-based pagination                                                                          |
+| `src/store/todosApi.ts`                                                    | RTK Query endpoints -- `listActiveTasks`, `listInactiveTasks`, `listCompletedTasks`, `createTask`, `updateTask`, `deleteTask`, `batchUpdateTasks` |
+| `src/lib/dayjs.ts`                                                         | Date utilities -- `getWeekDays()`, `getMonthGrid()`, `isToday()`                                                                                  |
 
 ## Task Data Model
 
 The `Task` type is defined in `src/lib/types.ts`:
 
-| Field          | Type                           | Description                                                    |
-| -------------- | ------------------------------ | -------------------------------------------------------------- |
-| `id`           | `string`                       | Prefixed nanoid (`task-...`), generated by `src/lib/id.ts`     |
-| `userId`       | `string`                       | Firebase Auth UID of the task owner                            |
-| `title`        | `string`                       | Task title (cleaned of token syntax before storage)            |
-| `description`  | `string`                       | Optional description (defaults to `""`)                        |
-| `isDone`       | `boolean`                      | Completion status                                              |
-| `category`     | `string \| null`               | Optional category label                                        |
-| `queue`        | `'day' \| 'week' \| null`      | Work queue assignment (Today / This Week / unassigned)         |
-| `priority`     | `Priority \| null`             | Optional priority level (see Priority type below)               |
-| `order`        | `number \| null`               | Sort position within a column/group (dense integer, set by drag-and-drop) |
-| `dueDate`      | `string \| null`               | Due date in `YYYY-MM-DD` format                                |
-| `createdAt`    | `number`                       | Timestamp in milliseconds                                      |
-| `updatedAt`    | `number`                       | Timestamp in milliseconds                                      |
+| Field         | Type                      | Description                                                               |
+| ------------- | ------------------------- | ------------------------------------------------------------------------- |
+| `id`          | `string`                  | Prefixed nanoid (`task-...`), generated by `src/lib/id.ts`                |
+| `userId`      | `string`                  | Firebase Auth UID of the task owner                                       |
+| `title`       | `string`                  | Task title (cleaned of token syntax before storage)                       |
+| `description` | `string`                  | Optional description (defaults to `""`)                                   |
+| `isDone`      | `boolean`                 | Completion status                                                         |
+| `category`    | `string \| null`          | Optional category label                                                   |
+| `queue`       | `'day' \| 'week' \| null` | Work queue assignment (Today / This Week / unassigned)                    |
+| `priority`    | `Priority \| null`        | Optional priority level (see Priority type below)                         |
+| `order`       | `number \| null`          | Sort position within a column/group (dense integer, set by drag-and-drop) |
+| `dueDate`     | `string \| null`          | Due date in `YYYY-MM-DD` format                                           |
+| `createdAt`   | `number`                  | Timestamp in milliseconds                                                 |
+| `updatedAt`   | `number`                  | Timestamp in milliseconds                                                 |
 
 The `Priority` type is a string union exported from `src/lib/types.ts`, with a companion `PRIORITIES` constant array that defines the canonical order:
 
@@ -67,11 +67,11 @@ The `Priority` type is a string union exported from `src/lib/types.ts`, with a c
 
 The `ParsedTaskFields` type (also in `src/lib/types.ts`) represents the structured data extracted from the SmartInput editor text:
 
-| Field        | Type               |
-| ------------ | ------------------ |
-| `category`   | `string \| null`   |
-| `priority`   | `Priority \| null` |
-| `dueDate`    | `string \| null`   |
+| Field      | Type               |
+| ---------- | ------------------ |
+| `category` | `string \| null`   |
+| `priority` | `Priority \| null` |
+| `dueDate`  | `string \| null`   |
 
 ## How It Works
 
@@ -100,15 +100,15 @@ The SmartInput is a single-line Tiptap editor that detects and highlights tokens
 
 **Tiptap extensions loaded:**
 
-| Extension                       | Source                                       | Purpose                                      |
-| ------------------------------- | -------------------------------------------- | -------------------------------------------- |
-| `Document`, `Paragraph`, `Text` | `@tiptap/extension-*`                        | Core ProseMirror schema                      |
-| `Placeholder`                   | `@tiptap/extension-placeholder`              | "Add a task..." placeholder text             |
-| `PriorityMark`                  | `./marks/PriorityMark.ts`                    | Highlights `P0`–`P4` priority tokens          |
-| `CategoryMark`                  | `./marks/CategoryMark.ts`                    | Highlights `@category` tokens                |
-| `DateMark`                      | `./marks/DateMark.ts`                        | Highlights natural-language date expressions |
+| Extension                       | Source                                       | Purpose                                          |
+| ------------------------------- | -------------------------------------------- | ------------------------------------------------ |
+| `Document`, `Paragraph`, `Text` | `@tiptap/extension-*`                        | Core ProseMirror schema                          |
+| `Placeholder`                   | `@tiptap/extension-placeholder`              | "Add a task..." placeholder text                 |
+| `PriorityMark`                  | `./marks/PriorityMark.ts`                    | Highlights `P0`–`P4` priority tokens             |
+| `CategoryMark`                  | `./marks/CategoryMark.ts`                    | Highlights `@category` tokens                    |
+| `DateMark`                      | `./marks/DateMark.ts`                        | Highlights natural-language date expressions     |
 | `KeyboardShortcutsExtension`    | Inline                                       | Enter/Cmd+Enter submit, Escape toggles detection |
-| Category suggestion             | Inline `createCategorySuggestionExtension()` | Autocomplete popup for `@` trigger           |
+| Category suggestion             | Inline `createCategorySuggestionExtension()` | Autocomplete popup for `@` trigger               |
 
 **Callbacks:** On every text update (`onUpdate`), the editor calls `extractFieldsFromText()` from `src/lib/tokenRegistry.ts` and passes the results up via `onFieldsChange`. `onFocus` and `onBlur` are forwarded to the parent for expansion control.
 
@@ -123,11 +123,11 @@ Central configuration for all inline token types. Exports:
 
 **Token detection patterns:**
 
-| Token    | Syntax                     | Example              | Detection                                                                 |
-| -------- | -------------------------- | -------------------- | ------------------------------------------------------------------------- |
-| Priority | `P0`, `P1`, `P2`, `P3`, `P4` | "Fix login P0"    | Regex `/\b[Pp][0-4]\b/g` -- maps to full `Priority` string via `PRIORITIES[n]` |
-| Category | `@name`          | "Fix login @work"    | Regex `/@([\w][\w-]*)(?:\s\|$)/g`                                         |
-| Date     | Natural language | "Fix login tomorrow" | [chrono-node](https://github.com/wanasit/chrono) with `forwardDate: true` |
+| Token    | Syntax                       | Example              | Detection                                                                      |
+| -------- | ---------------------------- | -------------------- | ------------------------------------------------------------------------------ |
+| Priority | `P0`, `P1`, `P2`, `P3`, `P4` | "Fix login P0"       | Regex `/\b[Pp][0-4]\b/g` -- maps to full `Priority` string via `PRIORITIES[n]` |
+| Category | `@name`                      | "Fix login @work"    | Regex `/@([\w][\w-]*)(?:\s\|$)/g`                                              |
+| Date     | Natural language             | "Fix login tomorrow" | [chrono-node](https://github.com/wanasit/chrono) with `forwardDate: true`      |
 
 #### Mark Extensions
 
@@ -179,24 +179,24 @@ A card-style form that wraps the SmartInput and adds an expandable dropdown pane
 
 **Field merging:** On submit, manual fields override parsed fields with this priority:
 
-| Field         | Merge rule                                                    |
-| ------------- | ------------------------------------------------------------- |
-| `category`    | Manual value if non-empty, otherwise parsed value             |
-| `priority`    | Manual select value if explicitly set, otherwise parsed value |
-| `dueDate`     | Manual date if set, otherwise parsed date from chrono-node    |
+| Field         | Merge rule                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `category`    | Manual value if non-empty, otherwise parsed value                                                                              |
+| `priority`    | Manual select value if explicitly set, otherwise parsed value                                                                  |
+| `dueDate`     | Manual date if set, otherwise parsed date from chrono-node                                                                     |
 | `queue`       | Manual select value if set, otherwise auto-derived from effective due date (today = 'day', this week = 'week', otherwise null) |
-| `description` | Manual only                                                   |
+| `description` | Manual only                                                                                                                    |
 
 **`TaskCreationData` type:**
 
-| Field         | Type                           | Description                                |
-| ------------- | ------------------------------ | ------------------------------------------ |
-| `title`       | `string`                       | Clean title with all token syntax stripped |
-| `description` | `string`                       | Optional description text                  |
-| `category`    | `string \| null`               | Merged category                            |
-| `queue`       | `'day' \| 'week' \| null`     | Queue assignment (auto-derived or manual)  |
-| `priority`    | `Priority \| null`             | Merged priority value                      |
-| `dueDate`     | `string \| null`               | Merged due date in `YYYY-MM-DD` format     |
+| Field         | Type                      | Description                                |
+| ------------- | ------------------------- | ------------------------------------------ |
+| `title`       | `string`                  | Clean title with all token syntax stripped |
+| `description` | `string`                  | Optional description text                  |
+| `category`    | `string \| null`          | Merged category                            |
+| `queue`       | `'day' \| 'week' \| null` | Queue assignment (auto-derived or manual)  |
+| `priority`    | `Priority \| null`        | Merged priority value                      |
+| `dueDate`     | `string \| null`          | Merged due date in `YYYY-MM-DD` format     |
 
 **Submit flow:**
 
@@ -217,24 +217,24 @@ Clicking the pencil icon on any `TaskCard` opens a modal form for editing all ta
 
 **Props:**
 
-| Prop                   | Type                            | Description                                        |
-| ---------------------- | ------------------------------- | -------------------------------------------------- |
-| `task`                 | `Task`                          | The task being edited (populates default values)   |
-| `onClose`              | `() => void`                    | Closes the modal                                   |
-| `onSave`               | `(updates: Partial<Task>) => void` | Saves the changed fields                        |
-| `onDelete`             | `() => void`                    | Deletes the task                                   |
-| `suggestedCategories`  | `string[]` (optional)           | Profile categories for autocomplete on the category field |
+| Prop                  | Type                               | Description                                               |
+| --------------------- | ---------------------------------- | --------------------------------------------------------- |
+| `task`                | `Task`                             | The task being edited (populates default values)          |
+| `onClose`             | `() => void`                       | Closes the modal                                          |
+| `onSave`              | `(updates: Partial<Task>) => void` | Saves the changed fields                                  |
+| `onDelete`            | `() => void`                       | Deletes the task                                          |
+| `suggestedCategories` | `string[]` (optional)              | Profile categories for autocomplete on the category field |
 
 **Form fields:**
 
-| Field         | Component        | Notes                                                        |
-| ------------- | ---------------- | ------------------------------------------------------------ |
-| Title         | `TextInput`      | Required (zod: `z.string().trim().min(1)`)                   |
-| Description   | `TextArea`       | 3 rows                                                       |
-| Category      | `TextSuggestion` | Free-text with profile-based autocomplete suggestions        |
-| Priority      | `Select`         | Options: None / P0 - Critical / P1 - Important / P2 - Standard / P3 - Optional / P4 - Later |
-| Queue         | `Select`         | Options: None / Today / This Week                            |
-| Due Date      | `DateInput`      | Date picker                                                  |
+| Field       | Component        | Notes                                                                                       |
+| ----------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| Title       | `TextInput`      | Required (zod: `z.string().trim().min(1)`)                                                  |
+| Description | `TextArea`       | 3 rows                                                                                      |
+| Category    | `TextSuggestion` | Free-text with profile-based autocomplete suggestions                                       |
+| Priority    | `Select`         | Options: None / P0 - Critical / P1 - Important / P2 - Standard / P3 - Optional / P4 - Later |
+| Queue       | `Select`         | Options: None / Today / This Week                                                           |
+| Due Date    | `DateInput`      | Date picker                                                                                 |
 
 The form fields are laid out as: title (full width), description (full width), then two 2-column rows -- category + priority, then queue + due date.
 
@@ -317,11 +317,11 @@ The Work view wraps its columns in a `DndContext` (from `@dnd-kit/core`) with `c
 
 **Container ID scheme** (defined in `src/lib/dnd.ts`):
 
-| Pattern                         | Example                          | Meaning                                 |
-| ------------------------------- | -------------------------------- | --------------------------------------- |
-| `column::<queue>`               | `column::day`                    | A column container (ungrouped)          |
-| `group::<queue>::<priority>`    | `group::day::P0 - Critical`     | A priority group within a column        |
-| `item::<taskId>`                | `item::task-abc123`              | A draggable task item                   |
+| Pattern                      | Example                     | Meaning                          |
+| ---------------------------- | --------------------------- | -------------------------------- |
+| `column::<queue>`            | `column::day`               | A column container (ungrouped)   |
+| `group::<queue>::<priority>` | `group::day::P0 - Critical` | A priority group within a column |
+| `item::<taskId>`             | `item::task-abc123`         | A draggable task item            |
 
 Columns use `column::` IDs when no tasks have priorities; when any task in a column has a priority, that column's tasks are organized into `group::` containers instead. The `parseContainerId()`, `getQueueFromContainerId()`, and `getPriorityFromContainerId()` helpers extract queue/priority values from these IDs.
 
@@ -350,17 +350,17 @@ On drop, `computeUpdates()` iterates over affected containers and assigns **dens
 
 `src/lib/dnd.ts` exports these helpers used by `WorkView`:
 
-| Function                  | Purpose                                                                                 |
-| ------------------------- | --------------------------------------------------------------------------------------- |
-| `buildContainerMap(tasks)` | Creates the initial container map from a flat task array, sorted by `order` then `createdAt` |
-| `buildColumnId(queue)`     | Builds a `column::<queue>` container ID                                                 |
-| `buildGroupId(queue, priority)` | Builds a `group::<queue>::<priority>` container ID                                |
-| `buildItemId(taskId)`      | Builds an `item::<taskId>` item ID                                                      |
-| `parseContainerId(id)`     | Parses any container ID into a typed object (`ParsedColumn`, `ParsedGroup`, or `ParsedItem`) |
-| `findContainer(map, taskId)` | Finds which container a task ID belongs to                                             |
-| `getColumnContainers(map, queue)` | Returns all containers for a given queue, sorted by priority order               |
-| `getOrCreateContainer(map, queue, priority)` | Finds or creates the correct container for a queue/priority combo       |
-| `sortTasks(tasks)`         | Sorts by `order` ascending (null last), then `createdAt` descending for null-order tasks |
+| Function                                     | Purpose                                                                                      |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `buildContainerMap(tasks)`                   | Creates the initial container map from a flat task array, sorted by `order` then `createdAt` |
+| `buildColumnId(queue)`                       | Builds a `column::<queue>` container ID                                                      |
+| `buildGroupId(queue, priority)`              | Builds a `group::<queue>::<priority>` container ID                                           |
+| `buildItemId(taskId)`                        | Builds an `item::<taskId>` item ID                                                           |
+| `parseContainerId(id)`                       | Parses any container ID into a typed object (`ParsedColumn`, `ParsedGroup`, or `ParsedItem`) |
+| `findContainer(map, taskId)`                 | Finds which container a task ID belongs to                                                   |
+| `getColumnContainers(map, queue)`            | Returns all containers for a given queue, sorted by priority order                           |
+| `getOrCreateContainer(map, queue, priority)` | Finds or creates the correct container for a queue/priority combo                            |
+| `sortTasks(tasks)`                           | Sorts by `order` ascending (null last), then `createdAt` descending for null-order tasks     |
 
 #### SortableTaskCard
 
@@ -396,12 +396,12 @@ A searchable, paginated flat list of all completed tasks. Unlike the Work and We
 
 **Props:**
 
-| Prop       | Type                                       | Description                                |
-| ---------- | ------------------------------------------ | ------------------------------------------ |
-| `userId`   | `string`                                   | Current user's ID (passed for data fetching) |
-| `onUpdate` | `(id: string, updates: Partial<Task>) => void` | Callback for task updates (routes to `handleUpdate` in `HomePage`) |
-| `onDelete` | `(id: string) => void`                     | Callback for task deletion (routes to `handleDelete` in `HomePage`) |
-| `onEdit`   | `(task: Task) => void`                     | Opens the Edit Task Modal                  |
+| Prop       | Type                                           | Description                                                         |
+| ---------- | ---------------------------------------------- | ------------------------------------------------------------------- |
+| `userId`   | `string`                                       | Current user's ID (passed for data fetching)                        |
+| `onUpdate` | `(id: string, updates: Partial<Task>) => void` | Callback for task updates (routes to `handleUpdate` in `HomePage`)  |
+| `onDelete` | `(id: string) => void`                         | Callback for task deletion (routes to `handleDelete` in `HomePage`) |
+| `onEdit`   | `(task: Task) => void`                         | Opens the Edit Task Modal                                           |
 
 **Data fetching:** On mount, the component triggers `listCompletedTasks({ userId })` to load the first page of completed tasks (100 items). The result is stored in local state (`tasks`, `hasMore`). An `isInitialLoad` flag shows a loading message until the first fetch completes.
 
@@ -434,12 +434,12 @@ A vertical column with a header (title + task count) and a scrollable list of ta
 
 The `TaskColumnGroup` type is exported from this file:
 
-| Field         | Type              | Description                                           |
-| ------------- | ----------------- | ----------------------------------------------------- |
-| `containerId` | `string`          | dnd-kit container ID (e.g., `group::day::P0 - Critical`) |
-| `label`       | `string \| null`  | Group header text, or `null` for ungrouped columns    |
-| `tasks`       | `Task[]`          | Tasks in this group, in display order                 |
-| `itemIds`     | `string[]`        | Item IDs (prefixed with `item::`) for `SortableContext` |
+| Field         | Type             | Description                                              |
+| ------------- | ---------------- | -------------------------------------------------------- |
+| `containerId` | `string`         | dnd-kit container ID (e.g., `group::day::P0 - Critical`) |
+| `label`       | `string \| null` | Group header text, or `null` for ungrouped columns       |
+| `tasks`       | `Task[]`         | Tasks in this group, in display order                    |
+| `itemIds`     | `string[]`       | Item IDs (prefixed with `item::`) for `SortableContext`  |
 
 ### UnscheduledSection
 
@@ -453,11 +453,11 @@ A collapsible section that renders tasks with no `dueDate`. Uses `CaretDownIcon`
 
 A segmented control with three options (Work, Week, Completed). Uses the `SegmentedControl` component from `src/components/common/SegmentedControl.tsx`. Each option has an icon and a text label:
 
-| Option    | Icon              | Description                        |
-| --------- | ----------------- | ---------------------------------- |
-| Work      | `ListBulletsIcon` | Kanban board with drag-and-drop    |
-| Week      | `CalendarDotsIcon`| Calendar columns for the week      |
-| Completed | `CheckCircleIcon` | Searchable archive of done tasks   |
+| Option    | Icon               | Description                      |
+| --------- | ------------------ | -------------------------------- |
+| Work      | `ListBulletsIcon`  | Kanban board with drag-and-drop  |
+| Week      | `CalendarDotsIcon` | Calendar columns for the week    |
+| Completed | `CheckCircleIcon`  | Searchable archive of done tasks |
 
 Exports the `View` type (`'work' | 'week' | 'completed'`).
 
@@ -482,15 +482,15 @@ Task endpoints are defined in `src/store/todosApi.ts` and profile endpoints are 
 
 ### Task Endpoints
 
-| Hook                              | Type     | Firestore Operation                                           | Cache Tags                                                                   |
-| --------------------------------- | -------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `useListActiveTasksQuery(userId)` | Query    | Two parallel queries: (1) `isDone == false` ordered by `createdAt desc`, (2) `isDone == true` AND `updatedAt >= oneMonthAgo` ordered by `updatedAt desc`. Results merged. | Provides `Task:{id}` per result + `Task:ACTIVE_LIST` |
-| `useListInactiveTasksQuery(userId)` | Query  | `getDocs` with `isDone == true` AND `updatedAt < oneMonthAgo`, ordered by `updatedAt desc` | Provides `Task:{id}` per result + `Task:INACTIVE_LIST` |
-| `useLazyListCompletedTasksQuery`  | Lazy query | `getDocs` with `isDone == true`, ordered by `updatedAt desc`, limit-based pagination (100 per page). Uses `startAfter(afterUpdatedAt)` for cursor. Returns `{ tasks, hasMore }`. | Provides `Task:{id}` per result + `Task:COMPLETED_LIST` |
-| `useCreateTaskMutation`           | Mutation | `setDoc` to `users/{userId}/tasks/{taskId}`                   | Invalidates `Task:ACTIVE_LIST`                                               |
-| `useUpdateTaskMutation`           | Mutation | `updateDoc` on `users/{userId}/tasks/{id}`                    | Invalidates `Task:{id}`; also invalidates `ACTIVE_LIST`, `INACTIVE_LIST`, and `COMPLETED_LIST` if `isDone` changed |
-| `useDeleteTaskMutation`           | Mutation | `deleteDoc` on `users/{userId}/tasks/{id}`                    | Invalidates `Task:{id}`, `Task:ACTIVE_LIST`, `Task:INACTIVE_LIST`, `Task:COMPLETED_LIST` |
-| `useBatchUpdateTasksMutation`     | Mutation | `writeBatch` updating multiple `users/{userId}/tasks/{id}` docs | Optimistic cache update on `listActiveTasks`; no tag invalidation (relies on optimistic update) |
+| Hook                                | Type       | Firestore Operation                                                                                                                                                              | Cache Tags                                                                                                         |
+| ----------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `useListActiveTasksQuery(userId)`   | Query      | Two parallel queries: (1) `isDone == false` ordered by `createdAt desc`, (2) `isDone == true` AND `updatedAt >= oneMonthAgo` ordered by `updatedAt desc`. Results merged.        | Provides `Task:{id}` per result + `Task:ACTIVE_LIST`                                                               |
+| `useListInactiveTasksQuery(userId)` | Query      | `getDocs` with `isDone == true` AND `updatedAt < oneMonthAgo`, ordered by `updatedAt desc`                                                                                       | Provides `Task:{id}` per result + `Task:INACTIVE_LIST`                                                             |
+| `useLazyListCompletedTasksQuery`    | Lazy query | `getDocs` with `isDone == true`, ordered by `updatedAt desc`, limit-based pagination (100 per page). Uses `startAfter(afterUpdatedAt)` for cursor. Returns `{ tasks, hasMore }`. | Provides `Task:{id}` per result + `Task:COMPLETED_LIST`                                                            |
+| `useCreateTaskMutation`             | Mutation   | `setDoc` to `users/{userId}/tasks/{taskId}`                                                                                                                                      | Invalidates `Task:ACTIVE_LIST`                                                                                     |
+| `useUpdateTaskMutation`             | Mutation   | `updateDoc` on `users/{userId}/tasks/{id}`                                                                                                                                       | Invalidates `Task:{id}`; also invalidates `ACTIVE_LIST`, `INACTIVE_LIST`, and `COMPLETED_LIST` if `isDone` changed |
+| `useDeleteTaskMutation`             | Mutation   | `deleteDoc` on `users/{userId}/tasks/{id}`                                                                                                                                       | Invalidates `Task:{id}`, `Task:ACTIVE_LIST`, `Task:INACTIVE_LIST`, `Task:COMPLETED_LIST`                           |
+| `useBatchUpdateTasksMutation`       | Mutation   | `writeBatch` updating multiple `users/{userId}/tasks/{id}` docs                                                                                                                  | Optimistic cache update on `listActiveTasks`; no tag invalidation (relies on optimistic update)                    |
 
 The Firestore collection path is `users/{userId}/tasks`. Helper functions `tasksCollection(userId)` and `taskDoc(userId, taskId)` build the collection/document references.
 
@@ -500,10 +500,10 @@ The Firestore collection path is `users/{userId}/tasks`. Helper functions `tasks
 
 ### Profile Endpoints
 
-| Hook                          | Type     | Firestore Operation                                              | Cache Tags                          |
-| ----------------------------- | -------- | ---------------------------------------------------------------- | ----------------------------------- |
-| `useGetProfileQuery(userId)`  | Query    | `getDoc` on `users/{userId}`, auto-creates default if not found  | Provides `Profile:{userId}`         |
-| `useUpdateProfileMutation`    | Mutation | `updateDoc` on `users/{userId}` with timestamp auto-update       | Invalidates `Profile:{userId}`      |
+| Hook                         | Type     | Firestore Operation                                             | Cache Tags                     |
+| ---------------------------- | -------- | --------------------------------------------------------------- | ------------------------------ |
+| `useGetProfileQuery(userId)` | Query    | `getDoc` on `users/{userId}`, auto-creates default if not found | Provides `Profile:{userId}`    |
+| `useUpdateProfileMutation`   | Mutation | `updateDoc` on `users/{userId}` with timestamp auto-update      | Invalidates `Profile:{userId}` |
 
 See [User Profiles](./user-profiles.md) for full details on how profiles power autocomplete suggestions.
 
@@ -531,12 +531,12 @@ The SmartInput and drag-and-drop features introduce these dependencies:
 | `@tiptap/extension-placeholder` | Placeholder text support                                                               |
 | `@tiptap/suggestion`            | Suggestion/autocomplete plugin framework                                               |
 | `chrono-node`                   | Natural language date parsing                                                          |
-| `@dnd-kit/core`                 | Core drag-and-drop framework (DndContext, sensors, collision detection, DragOverlay)    |
-| `@dnd-kit/sortable`            | Sortable preset (useSortable, SortableContext, verticalListSortingStrategy)             |
-| `@dnd-kit/utilities`           | CSS transform utilities for sortable items                                              |
-| `react-hook-form`              | Form state management for the Edit Task Modal                                           |
-| `@hookform/resolvers`          | Zod resolver adapter for react-hook-form validation                                     |
-| `zod`                          | Schema validation for Edit Task Modal form data                                         |
+| `@dnd-kit/core`                 | Core drag-and-drop framework (DndContext, sensors, collision detection, DragOverlay)   |
+| `@dnd-kit/sortable`             | Sortable preset (useSortable, SortableContext, verticalListSortingStrategy)            |
+| `@dnd-kit/utilities`            | CSS transform utilities for sortable items                                             |
+| `react-hook-form`               | Form state management for the Edit Task Modal                                          |
+| `@hookform/resolvers`           | Zod resolver adapter for react-hook-form validation                                    |
+| `zod`                           | Schema validation for Edit Task Modal form data                                        |
 
 ## CSS
 

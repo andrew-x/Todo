@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/incompatible-library */
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -40,12 +41,6 @@ export type TaskCreationData = {
   dueDate: string | null
 }
 
-type TaskCreationFormProps = {
-  onSubmit: (data: TaskCreationData) => void
-  suggestedCategories?: string[]
-  className?: string
-}
-
 const PRIORITY_OPTIONS = [
   { value: '', label: 'None' },
   ...PRIORITIES.map((p) => ({ value: p, label: p })),
@@ -69,11 +64,12 @@ const DEFAULT_VALUES: TaskFormValues = {
   description: '',
 }
 
-export default function TaskCreationForm({
-  onSubmit,
-  suggestedCategories,
-  className,
-}: TaskCreationFormProps) {
+export default function TaskCreationForm(props: {
+  onSubmit: (data: TaskCreationData) => void
+  suggestedCategories?: string[]
+  className?: string
+}) {
+  const { onSubmit, suggestedCategories, className } = props
   const smartInputRef = useRef<SmartInputRef>(null)
 
   const [parsedFields, setParsedFields] = useState<ParsedTaskFields>({
@@ -127,7 +123,7 @@ export default function TaskCreationForm({
     setIsExpanded(true)
   }, [])
 
-  function resetAll() {
+  const resetAll = useCallback(() => {
     setParsedFields({
       category: null,
       priority: null,
@@ -135,12 +131,12 @@ export default function TaskCreationForm({
     })
     resetForm(DEFAULT_VALUES)
     smartInputRef.current?.clearContent()
-  }
+  }, [resetForm])
 
-  function handleCancel() {
+  const handleCancel = useCallback(() => {
     resetAll()
     setIsExpanded(false)
-  }
+  }, [resetAll])
 
   // Click outside to close
   useEffect(() => {
@@ -154,7 +150,7 @@ export default function TaskCreationForm({
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isExpanded])
+  }, [isExpanded, handleCancel])
 
   function handleSubmit() {
     const rawText = smartInputRef.current?.getText() ?? ''

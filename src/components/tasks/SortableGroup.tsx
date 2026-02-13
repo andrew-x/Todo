@@ -1,17 +1,12 @@
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 
-export type SortableGroupProps = {
+export default function SortableGroup(props: {
   id: string
   items: string[]
   children: React.ReactNode
-}
-
-export default function SortableGroup({
-  id,
-  items,
-  children,
-}: SortableGroupProps) {
+}) {
+  const { id, items, children } = props
   const { setNodeRef, isOver } = useDroppable({ id })
 
   return (

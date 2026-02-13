@@ -12,19 +12,19 @@ paths:
 
 ## Components (`src/components/common/`)
 
-| Component   | File            | Variants / Props                                                                                               |
-| ----------- | --------------- | -------------------------------------------------------------------------------------------------------------- |
-| `Button`    | `Button.tsx`    | `variant`: default, primary, danger, outline, ghost, link · `size`: xs–xl · `isLoading` · polymorphic (`href` → `<a>`) |
-| `TextInput` | `TextInput.tsx` | `size`: xs–xl · `label` · `error`                                                                              |
-| `TextArea`  | `TextArea.tsx`  | `size`: xs–xl · `label` · `error`                                                                              |
-| `Pill`      | `Pill.tsx`      | `color`: default, primary, secondary, success, warning, error · `size`: sm, md · `onRemove`                    |
-| `PillInput` | `PillInput.tsx` | `size`: xs–xl · `values` / `onValuesChange` · `label` · `error`                                                |
-| `Select`    | `Select.tsx`    | `size`: xs–xl · `options` · `label` · `error` · `placeholder` · custom caret icon                              |
-| `DateInput`       | `DateInput.tsx`       | `size`: xs–xl · `value` / `onChange` (YYYY-MM-DD) · `label` · `error` · calendar popup with keyboard nav       |
-| `TextSuggestion`  | `TextSuggestion.tsx`  | `size`: xs–xl · `suggestions` · `onSelect` · `label` · `error` · controlled & uncontrolled · combobox dropdown with keyboard nav |
-| `Modal`           | `Modal.tsx`           | `size`: sm, md, lg · `open` / `onClose` · `title` · `footer` · portal to body · Escape/backdrop close · scroll lock |
-| `IconButton`       | `IconButton.tsx`       | `variant`: default–link · `size`: xs–xl · `label` (required, tooltip + aria-label) · `isLoading`                     |
-| `SegmentedControl` | `SegmentedControl.tsx` | Generic `<T extends string>` · `options` (value, label, icon?) · `value` / `onChange` · `size`: xs–xl · tablist a11y |
+| Component          | File                   | Variants / Props                                                                                                                 |
+| ------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`           | `Button.tsx`           | `variant`: default, primary, danger, outline, ghost, link · `size`: xs–xl · `isLoading` · polymorphic (`href` → `<a>`)           |
+| `TextInput`        | `TextInput.tsx`        | `size`: xs–xl · `label` · `error`                                                                                                |
+| `TextArea`         | `TextArea.tsx`         | `size`: xs–xl · `label` · `error`                                                                                                |
+| `Pill`             | `Pill.tsx`             | `color`: default, primary, secondary, success, warning, error · `size`: xs, sm, md · `onRemove`                                      |
+| `PillInput`        | `PillInput.tsx`        | `size`: xs–xl · `values` / `onValuesChange` · `label` · `error`                                                                  |
+| `Select`           | `Select.tsx`           | `size`: xs–xl · `options` · `label` · `error` · `placeholder` · custom caret icon                                                |
+| `DateInput`        | `DateInput.tsx`        | `size`: xs–xl · `value` / `onChange` (YYYY-MM-DD) · `label` · `error` · calendar popup with keyboard nav                         |
+| `TextSuggestion`   | `TextSuggestion.tsx`   | `size`: xs–xl · `suggestions` · `onSelect` · `label` · `error` · controlled & uncontrolled · combobox dropdown with keyboard nav |
+| `Modal`            | `Modal.tsx`            | `size`: sm, md, lg · `open` / `onClose` · `title` · `footer` · portal to body · Escape/backdrop close · scroll lock              |
+| `IconButton`       | `IconButton.tsx`       | `variant`: default–link · `size`: xs–xl · `label` (required, tooltip + aria-label) · `isLoading`                                 |
+| `SegmentedControl` | `SegmentedControl.tsx` | Generic `<T extends string>` · `options` (value, label, icon?) · `value` / `onChange` · `size`: xs–xl · tablist a11y             |
 
 ## Size Scale
 

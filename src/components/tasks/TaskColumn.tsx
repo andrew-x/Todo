@@ -168,9 +168,12 @@ function StaticTaskColumn({
             No tasks
           </p>
         ) : priorityGroups ? (
-          priorityGroups.map((group) => (
-            <div key={group.priority ?? 'none'} className="stack gap-2">
-              <p className="text-text-tertiary mt-1 text-xs font-medium first:mt-0">
+          priorityGroups.map((group, i) => (
+            <div
+              key={group.priority ?? 'none'}
+              className={cn('stack gap-2', i > 0 && 'pt-2')}
+            >
+              <p className="text-text-tertiary text-xs font-medium">
                 {group.label}
               </p>
               {group.tasks.map((task) => (
@@ -249,15 +252,15 @@ function DndTaskColumn({
       </div>
 
       <div className="stack flex-1 gap-2 overflow-y-auto">
-        {groups.map((group) => (
+        {groups.map((group, i) => (
           <SortableGroup
             key={group.containerId}
             id={group.containerId}
             items={group.itemIds}
           >
-            <div className="stack gap-2">
+            <div className={cn('stack gap-2', i > 0 && 'pt-2')}>
               {group.label && (
-                <p className="text-text-tertiary mt-1 text-xs font-medium first:mt-0">
+                <p className="text-text-tertiary text-xs font-medium">
                   {group.label}
                 </p>
               )}
