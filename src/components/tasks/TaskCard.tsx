@@ -1,6 +1,7 @@
 import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 import {
+  CalendarBlankIcon,
   DotsSixVerticalIcon,
   PencilSimpleIcon,
   TagIcon,
@@ -9,6 +10,7 @@ import {
 import IconButton from '@/components/common/IconButton'
 import Pill from '@/components/common/Pill'
 import cn from '@/lib/classnames'
+import dayjs, { fromISODate, isToday } from '@/lib/dayjs'
 import type { Color, Priority, Task } from '@/lib/types'
 
 export type TaskCardProps = {
@@ -41,7 +43,12 @@ export default function TaskCard(props: TaskCardProps) {
     dragHandleAttributes,
   } = props
   const hasDescription = task.description.length > 0
-  const hasMetadata = task.category !== null || task.priority !== null
+  const hasMetadata =
+    task.category !== null || task.priority !== null || task.dueDate !== null
+
+  const dueDate = task.dueDate ? fromISODate(task.dueDate) : null
+  const isOverdue =
+    dueDate !== null && !isToday(dueDate) && dueDate.isBefore(dayjs(), 'day')
 
   return (
     <div
@@ -93,6 +100,18 @@ export default function TaskCard(props: TaskCardProps) {
               <p className="text-text-secondary flex items-center gap-1 text-xs">
                 <TagIcon size={12} /> {task.category}
               </p>
+            )}
+            {dueDate && (
+              <span
+                className={cn(
+                  'tooltip flex items-center gap-1 text-xs',
+                  isOverdue ? 'text-error' : 'text-text-secondary',
+                )}
+                data-tooltip={dueDate.format('MMM D, YYYY')}
+              >
+                <CalendarBlankIcon size={12} />
+                {isToday(dueDate) ? 'Today' : dueDate.fromNow()}
+              </span>
             )}
             {task.priority && (
               <Pill

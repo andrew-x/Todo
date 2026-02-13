@@ -1,7 +1,7 @@
+import { CircleNotchIcon, GoogleLogoIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 import { useAuth } from '@/components/auth/AuthProvider'
-import Button from '@/components/common/Button'
 import logger from '@/lib/logger'
 
 export default function GoogleSignInButton() {
@@ -24,14 +24,20 @@ export default function GoogleSignInButton() {
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <Button
-        variant="primary"
-        size="lg"
+      <button
+        type="button"
         onClick={handleSignIn}
-        isLoading={isLoading}
+        disabled={isLoading}
+        aria-busy={isLoading || undefined}
+        className="border-border-default hover:bg-surface-hover text-text-primary focus-ring transition-smooth inline-flex h-10 cursor-pointer items-center justify-center gap-2.5 rounded-md border bg-white px-5 text-sm font-medium disabled:pointer-events-none disabled:opacity-50"
       >
+        {isLoading ? (
+          <CircleNotchIcon size={18} className="animate-spin" />
+        ) : (
+          <GoogleLogoIcon size={18} weight="bold" />
+        )}
         Sign in with Google
-      </Button>
+      </button>
       {error && <p className="text-error text-sm">{error}</p>}
     </div>
   )
