@@ -19,7 +19,7 @@ function RootLayout() {
     <div className="flex min-h-screen flex-col">
       <header className="flex items-center justify-between px-6 py-2">
         <Link to="/" className="transition-smooth hover:opacity-80">
-          <img src="/logo.svg" alt="Todo" className="h-5" />
+          <img src="/logo.svg" alt="Todo" className="h-7" />
         </Link>
         {!isLoading && user && (
           <div className="flex items-center gap-3">

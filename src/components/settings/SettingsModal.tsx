@@ -4,10 +4,12 @@ import { useState } from 'react'
 import Button from '@/components/common/Button'
 import Modal from '@/components/common/Modal'
 import TextInput from '@/components/common/TextInput'
+import logger from '@/lib/logger'
 import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from '@/store/profileApi'
+import { useBackfillCompletedAtMutation } from '@/store/todosApi'
 
 export default function SettingsModal(props: {
   userId: string
@@ -17,7 +19,13 @@ export default function SettingsModal(props: {
   const { userId, open, onClose } = props
   const { data: profile } = useGetProfileQuery(userId)
   const [updateProfile] = useUpdateProfileMutation()
+  const [backfill, { isLoading: isBackfilling }] =
+    useBackfillCompletedAtMutation()
   const [newCategory, setNewCategory] = useState('')
+  const [backfillResult, setBackfillResult] = useState<{
+    updated: number
+    skipped: number
+  } | null>(null)
 
   const categories = profile?.categories ?? []
 
@@ -45,6 +53,16 @@ export default function SettingsModal(props: {
     if (e.key === 'Enter') {
       e.preventDefault()
       handleAdd()
+    }
+  }
+
+  async function handleBackfill() {
+    try {
+      const result = await backfill(userId).unwrap()
+      setBackfillResult(result)
+      logger.info('backfillCompletedAt result', result)
+    } catch (e) {
+      logger.error('backfillCompletedAt failed', e)
     }
   }
 
@@ -94,6 +112,32 @@ export default function SettingsModal(props: {
           <Button size="sm" variant="ghost" onClick={handleAdd}>
             Add
           </Button>
+        </div>
+
+        <div className="border-border-default stack gap-2 border-t pt-4">
+          <h3 className="text-text-tertiary text-xs font-medium tracking-wider uppercase">
+            Developer
+          </h3>
+          <p className="text-text-tertiary text-xs">
+            Backfill <code>completedAt</code> for tasks completed before this
+            field was added. Sets it to each task's last updated time.
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleBackfill}
+              isLoading={isBackfilling}
+            >
+              Run Backfill
+            </Button>
+            {backfillResult && (
+              <p className="text-text-secondary text-xs">
+                {backfillResult.updated} updated, {backfillResult.skipped}{' '}
+                skipped
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </Modal>

@@ -20,7 +20,7 @@ function groupByMonth(tasks: Task[]): MonthGroup[] {
   let current: MonthGroup | null = null
 
   for (const task of tasks) {
-    const d = dayjs(task.updatedAt)
+    const d = dayjs(task.completedAt ?? task.updatedAt)
     const key = d.format('YYYY-MM')
 
     if (!current || current.key !== key) {

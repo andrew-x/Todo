@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { CheckCircleIcon } from '@phosphor-icons/react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useAuth } from '@/components/auth/AuthProvider'
+import IconButton from '@/components/common/IconButton'
 import SegmentedControl, {
   type Option,
 } from '@/components/common/SegmentedControl'
@@ -12,6 +14,7 @@ import CompletedView from '@/components/views/CompletedView'
 import ViewSwitcher, { type View } from '@/components/views/ViewSwitcher'
 import WeekView from '@/components/views/WeekView'
 import WorkView from '@/components/views/WorkView'
+import dayjs from '@/lib/dayjs'
 import logger from '@/lib/logger'
 import type { Task } from '@/lib/types'
 import {
@@ -74,6 +77,20 @@ export default function HomePage() {
     categoryFilter === 'all'
       ? tasks
       : tasks.filter((t) => t.category === categoryFilter)
+
+  const { completedToday, completedThisWeek } = useMemo(() => {
+    const startOfToday = dayjs().startOf('day').valueOf()
+    const startOfWeek = dayjs().startOf('isoWeek').valueOf()
+    let today = 0
+    let week = 0
+    for (const t of tasks) {
+      if (t.isDone && t.completedAt) {
+        if (t.completedAt >= startOfToday) today++
+        if (t.completedAt >= startOfWeek) week++
+      }
+    }
+    return { completedToday: today, completedThisWeek: week }
+  }, [tasks])
 
   function handleAdd(data: TaskCreationData) {
     createTask({ userId, ...data })
@@ -168,7 +185,7 @@ export default function HomePage() {
     : null
 
   return (
-    <div className="stack flex-1 gap-6 p-6">
+    <div className="stack flex-1 gap-6 px-6 py-3">
       {error && (
         <div className="bg-error-subtle stack gap-2 rounded-md px-4 py-3 text-sm">
           <p className="text-error font-medium">Unexpected error</p>
@@ -182,13 +199,15 @@ export default function HomePage() {
       {mutationError && (
         <div className="bg-error-subtle flex items-center justify-between rounded-md px-4 py-3 text-sm">
           <p className="text-error font-medium">{mutationError}</p>
-          <button
+          <IconButton
             onClick={() => setMutationError(null)}
-            className="text-error/70 hover:text-error ml-4 text-lg leading-none"
-            aria-label="Dismiss error"
+            label="Dismiss error"
+            variant="ghost"
+            size="sm"
+            className="text-error/70 hover:text-error ml-4"
           >
             &times;
-          </button>
+          </IconButton>
         </div>
       )}
 
@@ -207,6 +226,15 @@ export default function HomePage() {
             size="sm"
           />
         )}
+        {activeView === 'work' &&
+          (completedToday > 0 || completedThisWeek > 0) && (
+            <div className="bg-success-subtle ml-auto flex items-center gap-1.5 rounded-full px-3 py-1">
+              <CheckCircleIcon weight="fill" className="text-success size-4" />
+              <span className="text-success text-xs font-medium tabular-nums">
+                {`${completedToday} today · ${completedThisWeek} this week`}
+              </span>
+            </div>
+          )}
       </div>
 
       {activeView === 'work' && (

@@ -177,6 +177,7 @@ const todosApi = api.injectEndpoints({
             priority: fields.priority ?? null,
             order: fields.order ?? null,
             dueDate: fields.dueDate ?? null,
+            completedAt: fields.isDone ? now : null,
             createdAt: now,
             updatedAt: now,
           }
@@ -197,10 +198,15 @@ const todosApi = api.injectEndpoints({
     >({
       queryFn: async ({ userId, id, ...patch }) => {
         try {
-          await updateDoc(taskDoc(userId, id), {
+          const now = dayjs().valueOf()
+          const firestorePatch: Record<string, unknown> = {
             ...patch,
-            updatedAt: dayjs().valueOf(),
-          })
+            updatedAt: now,
+          }
+          if ('isDone' in patch) {
+            firestorePatch.completedAt = patch.isDone ? now : null
+          }
+          await updateDoc(taskDoc(userId, id), firestorePatch)
           logger.info('updateTask', { id, fields: Object.keys(patch) })
           return { data: undefined }
         } catch (e) {
@@ -212,11 +218,16 @@ const todosApi = api.injectEndpoints({
         { userId, id, ...patch },
         { dispatch, queryFulfilled },
       ) {
+        const now = dayjs().valueOf()
+        const optimisticPatch: Partial<Task> = { ...patch, updatedAt: now }
+        if ('isDone' in patch) {
+          optimisticPatch.completedAt = patch.isDone ? now : null
+        }
         const patchResult = dispatch(
           todosApi.util.updateQueryData('listActiveTasks', userId, (draft) => {
             const task = draft.find((t) => t.id === id)
             if (task) {
-              Object.assign(task, patch, { updatedAt: dayjs().valueOf() })
+              Object.assign(task, optimisticPatch)
             }
           }),
         )
@@ -306,6 +317,58 @@ const todosApiExtended = todosApi.injectEndpoints({
         queryFulfilled.catch(patchResult.undo)
       },
     }),
+
+    backfillCompletedAt: build.mutation<
+      { updated: number; skipped: number },
+      string
+    >({
+      queryFn: async (userId) => {
+        try {
+          const snap = await getDocs(
+            query(tasksCollection(userId), where('isDone', '==', true)),
+          )
+
+          let updated = 0
+          let skipped = 0
+          const BATCH_LIMIT = 500
+
+          let batch = writeBatch(db)
+          let batchCount = 0
+
+          for (const d of snap.docs) {
+            const data = d.data()
+            if (data.completedAt == null) {
+              batch.update(d.ref, { completedAt: data.updatedAt })
+              updated++
+              batchCount++
+
+              if (batchCount >= BATCH_LIMIT) {
+                await batch.commit()
+                batch = writeBatch(db)
+                batchCount = 0
+              }
+            } else {
+              skipped++
+            }
+          }
+
+          if (batchCount > 0) {
+            await batch.commit()
+          }
+
+          logger.info('backfillCompletedAt', { updated, skipped })
+          return { data: { updated, skipped } }
+        } catch (e) {
+          logger.error('backfillCompletedAt failed', e)
+          return { error: toFirestoreError(e) }
+        }
+      },
+      invalidatesTags: [
+        { type: 'Task', id: 'ACTIVE_LIST' },
+        { type: 'Task', id: 'INACTIVE_LIST' },
+        { type: 'Task', id: 'COMPLETED_LIST' },
+      ],
+    }),
   }),
 })
 
@@ -318,4 +381,5 @@ export const {
   useDeleteTaskMutation,
 } = todosApi
 
-export const { useBatchUpdateTasksMutation } = todosApiExtended
+export const { useBatchUpdateTasksMutation, useBackfillCompletedAtMutation } =
+  todosApiExtended

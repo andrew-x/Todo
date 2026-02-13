@@ -54,6 +54,7 @@ export type Task = {
 
   dueDate: string | null // date in YYYY-MM-DD format
 
+  completedAt: number | null // timestamp in milliseconds
   createdAt: number // timestamp in milliseconds
   updatedAt: number // timestamp in milliseconds
 }

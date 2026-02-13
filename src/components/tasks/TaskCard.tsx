@@ -2,6 +2,7 @@ import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 import {
   CalendarBlankIcon,
+  CheckCircleIcon,
   DotsSixVerticalIcon,
   PencilSimpleIcon,
   TagIcon,
@@ -44,7 +45,10 @@ export default function TaskCard(props: TaskCardProps) {
   } = props
   const hasDescription = task.description.length > 0
   const hasMetadata =
-    task.category !== null || task.priority !== null || task.dueDate !== null
+    task.category !== null ||
+    task.priority !== null ||
+    task.dueDate !== null ||
+    (task.isDone && task.completedAt != null)
 
   const dueDate = task.dueDate ? fromISODate(task.dueDate) : null
   const isOverdue =
@@ -111,6 +115,12 @@ export default function TaskCard(props: TaskCardProps) {
               >
                 <CalendarBlankIcon size={12} />
                 {isToday(dueDate) ? 'Today' : dueDate.fromNow()}
+              </span>
+            )}
+            {task.isDone && task.completedAt != null && (
+              <span className="text-text-tertiary flex items-center gap-1 text-xs">
+                <CheckCircleIcon size={12} />
+                {dayjs(task.completedAt).fromNow()}
               </span>
             )}
             {task.priority && (
