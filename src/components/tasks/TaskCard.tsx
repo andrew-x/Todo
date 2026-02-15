@@ -114,7 +114,9 @@ export default function TaskCard(props: TaskCardProps) {
                 data-tooltip={dueDate.format('MMM D, YYYY')}
               >
                 <CalendarBlankIcon size={12} />
-                {isToday(dueDate) ? 'Today' : dueDate.fromNow()}
+                {isToday(dueDate)
+                  ? 'Today'
+                  : dueDate.from(dayjs().startOf('day'))}
               </span>
             )}
             {task.isDone && task.completedAt != null && (
