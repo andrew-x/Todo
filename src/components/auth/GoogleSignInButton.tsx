@@ -29,7 +29,7 @@ export default function GoogleSignInButton() {
         onClick={handleSignIn}
         disabled={isLoading}
         aria-busy={isLoading || undefined}
-        className="border-border-default hover:bg-surface-hover text-text-primary focus-ring transition-smooth inline-flex h-10 cursor-pointer items-center justify-center gap-2.5 rounded-md border bg-white px-5 text-sm font-medium disabled:pointer-events-none disabled:opacity-50"
+        className="border-border-default bg-surface-secondary hover:bg-surface-hover text-text-primary focus-ring transition-smooth inline-flex h-10 cursor-pointer items-center justify-center gap-2.5 rounded-md border px-5 text-sm font-medium disabled:pointer-events-none disabled:opacity-50"
       >
         {isLoading ? (
           <CircleNotchIcon size={18} className="animate-spin" />
