@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-- Todo app: React 19 + TypeScript 5.9 + Vite 7 + Tailwind 4
+- Todo app: React + TypeScript + Vite + Tailwind
 - Package manager: bun
 - Path alias: `@/*` -> `src/*`
 
@@ -13,12 +13,12 @@
 - `docs/firebase-auth.md` -- Firebase Auth with Google sign-in, AuthProvider context, route protection
 - `docs/home-page.md` -- Home page: SmartInput (Tiptap), TaskCreationForm, Work/Week/Completed views, task CRUD, profile-driven suggestions
 - `docs/user-profiles.md` -- User profile data model, profile-driven autocomplete, auto-update flow
-- `docs/routing.md` -- React Router v7 declarative routing setup
+- `docs/routing.md` -- React Router declarative routing setup
 - `docs/state-management.md` -- Redux store, RTK Query architecture, Firestore integration
 
 ## Architecture Notes
 
-- **Routing**: React Router v7 (^7.13.0), library/declarative mode, single `react-router` package
+- **Routing**: React Router, library/declarative mode, single `react-router` package
 - **App shell**: `src/App.tsx` has RootLayout + route table; `src/main.tsx` is entry point
 - **Entry point**: `src/main.tsx` -> `Provider` -> `App` -> `BrowserRouter` -> Routes
 - Routes: `/` (LandingPage), `/home` (HomePage -- task management UI with 3 views: Work + Week + Completed)
@@ -28,15 +28,15 @@
 - **Firestore integration**: `queryFn` inside each endpoint calls Firestore SDK directly; no HTTP
 - **Cache tags**: `'Task'` and `'Profile'` registered in `src/store/api.ts`
 - **setupListeners** enabled for refetchOnFocus/reconnect support
-- Dependencies: `@reduxjs/toolkit` ^2.11.2, `react-redux` ^9.2.0
+- Dependencies: `@reduxjs/toolkit`, `react-redux`
 
 ## Component Directory Structure
 
 Components are organized by feature area under `src/components/`:
 
 - `src/components/auth/` -- AuthProvider, ProtectedRoute, GoogleSignInButton
-- `src/components/common/` -- Design system (Button, TextInput, TextArea, Pill, PillInput, Select, DateInput, TextSuggestion, Modal, SegmentedControl)
-- `src/components/tasks/` -- TaskCard, SortableTaskCard, TaskColumn, SortableGroup, UnscheduledSection
+- `src/components/common/` -- Design system (Button, TextInput, TextArea, Pill, PillInput, Select, DateInput, TextSuggestion, Modal, Popover, SegmentedControl)
+- `src/components/tasks/` -- TaskCard, SortableTaskCard, TaskColumn, SortableGroup, UnscheduledSection, ReschedulePopover
 - `src/components/views/` -- WorkView, WeekView, CompletedView, ViewSwitcher
 - `src/components/task-editor/` -- TaskCreationForm, EditTaskModal, SmartInput/
 - `src/components/settings/` -- SettingsModal
@@ -45,17 +45,17 @@ NOTE: The old `src/components/home/` directory no longer exists. It was split in
 
 ## Design System
 
-- Components in `src/components/common/`: Button, TextInput, TextArea, Pill, PillInput, Select, DateInput, TextSuggestion, Modal, SegmentedControl
+- Components in `src/components/common/`: Button, TextInput, TextArea, Pill, PillInput, Select, DateInput, TextSuggestion, Modal, Popover, SegmentedControl
 - CVA for type-safe variants; `cn` (`clsx` + `tailwind-merge`) for class merging
 - Shared types in `src/lib/types.ts`: `Size` ('xs'-'xl'), `Color` (6 values), `Priority` (string union), `PRIORITIES` (ordered array), `ParsedTaskFields`, `Profile`, `Task`
 - Consistent size scale (xs-xl) across components; Pill only supports sm/md
-- PillInput composes Pill; DateInput uses dayjs helpers; Modal uses createPortal; TextSuggestion is standalone with combobox ARIA; all other components are standalone
+- PillInput composes Pill; DateInput uses dayjs helpers; Modal uses createPortal; TextSuggestion is standalone with combobox ARIA; Popover is a lightweight controlled popover (no portal, no CVA, flip-up detection); all other components are standalone
 - Error pattern: `border-error` + `aria-invalid` + `aria-describedby`
 - No barrel files; import directly from component files
 
 ## Theme & Styling
 
-- Dark-only theme in `src/styles/index.css` via Tailwind v4 `@theme`
+- Dark-only theme in `src/styles/index.css` via Tailwind `@theme`
 - Custom utilities in `src/styles/utilities.css` (center-all, stack, transition-smooth, focus-ring)
 - Tiptap placeholder CSS rule in `src/styles/index.css` (`@layer base`)
 - Semantic tokens only -- never raw Tailwind colors
@@ -89,14 +89,16 @@ NOTE: The old `src/components/home/` directory no longer exists. It was split in
 - Active tasks = two parallel Firestore queries merged: (1) isDone==false by createdAt, (2) isDone==true + updatedAt>=oneMonthAgo by updatedAt
 - Composite Firestore indexes required: `isDone + updatedAt` and `isDone + createdAt` (defined in `firestore.indexes.json`)
 - **EditTaskModal**: `src/components/task-editor/EditTaskModal.tsx` -- react-hook-form + zod + Controller; edits title/description/category/priority/queue/dueDate; delete with confirmation; dirty-checking
-- **TaskCard**: pencil icon (PencilSimpleIcon) for edit; onEdit prop
-- **onEdit prop chain**: HomePage -> Views -> TaskColumn/UnscheduledSection -> SortableTaskCard -> TaskCard
+- **TaskCard**: reschedule popover (ClockClockwiseIcon) + pencil icon (PencilSimpleIcon) for edit; onEdit and onUpdate props
+- **ReschedulePopover**: `src/components/tasks/ReschedulePopover.tsx` -- date shortcuts + calendar grid inside Popover; optional `trigger` prop for custom trigger elements; used in TaskCard and WeekView bulk reschedule
+- **onEdit prop chain**: HomePage -> Views -> TaskColumn/UnscheduledSection/DndWeekDayColumn/OverdueSection -> SortableTaskCard/TaskCard
 - Profile data powers autocomplete suggestions; new categories auto-update profile on task creation and editing
 - View state managed locally in HomePage (`useState<View>('work')`)
-- WorkView: kanban with drag-and-drop (dnd-kit); filters by `queue` field
-- WeekView: filters by `dueDate`, uses `getWeekDays()`, has week navigation, collapsible weekend
+- WorkView: kanban with drag-and-drop (dnd-kit); filters by `queue` field; uses `column::`/`group::` container IDs
+- WeekView: DnD-enabled day columns + overdue section + past-day bulk reschedule; uses `datecol::`/`dategrp::` container IDs; internal `DndWeekDayColumn` and `OverdueSection` components
+- **UnscheduledSection**: dual-mode (static/dnd); DnD mode used by WeekView with `groups`/`columnId`/`totalCount` props
 - Task type in `src/lib/types.ts` -- key fields: userId, queue, dueDate, isDone, priority (Priority | null), category (no tags, no subTasks)
-- `src/lib/dnd.ts`: container ID scheme, buildContainerMap, sortTasks, findContainer
+- `src/lib/dnd.ts`: queue-based (`column::`/`group::`) and date-based (`datecol::`/`dategrp::`) container IDs; `buildContainerMap` (Work), `buildDateContainerMap` (Week), sortTasks, findContainer
 - DnD dependencies: @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
 - `src/lib/dayjs.ts` has calendar helpers: `getWeekDays()`, `getMonthGrid()`, `isToday()`
 

@@ -23,15 +23,16 @@ After signing in, the user lands on the Home page. The page fetches all **active
 | `src/components/settings/SettingsModal.tsx`                                | Settings modal for viewing and managing profile categories (add/delete)                                                                           |
 | `src/lib/tokenRegistry.ts`                                                 | Token config array, `extractFieldsFromText()`, `getCleanTitle()`, color mappings                                                                  |
 | `src/lib/types.ts`                                                         | `Task` and `ParsedTaskFields` type definitions                                                                                                    |
-| `src/components/tasks/TaskCard.tsx`                                        | Interactive task card -- checkbox, edit button, drag handle                                                                                       |
-| `src/components/tasks/TaskColumn.tsx`                                      | Dual-mode column: static (WeekView) or DnD-enabled (WorkView via `groups` prop); includes `DoneSection` for completed tasks                       |
+| `src/components/tasks/TaskCard.tsx`                                        | Interactive task card -- checkbox, reschedule popover, edit button, drag handle                                                                   |
+| `src/components/tasks/ReschedulePopover.tsx`                               | Inline date-reschedule popover with shortcuts (Today, Tomorrow, etc.) and a calendar grid                                                        |
+| `src/components/tasks/TaskColumn.tsx`                                      | Dual-mode column: static or DnD-enabled (WorkView via `groups` prop); exports `TaskColumnGroup` type; includes `DoneSection` for completed tasks   |
 | `src/components/tasks/SortableTaskCard.tsx`                                | Wraps TaskCard with dnd-kit's `useSortable` hook for drag-and-drop reordering                                                                     |
 | `src/components/tasks/SortableGroup.tsx`                                   | `useDroppable` + `SortableContext` wrapper for priority groups within a column                                                                    |
-| `src/lib/dnd.ts`                                                           | Container ID builders/parsers, task sorting by order, container map for multi-container DnD                                                       |
+| `src/lib/dnd.ts`                                                           | Container ID builders/parsers (queue-based + date-based), task sorting by order, container maps for Work and Week view DnD                         |
 | `src/components/tasks/UnscheduledSection.tsx`                              | Collapsible section for tasks with no due date                                                                                                    |
 | `src/components/views/ViewSwitcher.tsx`                                    | Segmented control to switch between Work / Week / Completed views                                                                                 |
 | `src/components/views/WorkView.tsx`                                        | 3-column kanban with drag-and-drop (DndContext, sensors, drag state, batch updates)                                                               |
-| `src/components/views/WeekView.tsx`                                        | 7-day columns (Mon-Sun) filtered by `dueDate`                                                                                                     |
+| `src/components/views/WeekView.tsx`                                        | 7-day columns (Mon-Sun) with DnD, overdue section, past-day bulk reschedule                                                                       |
 | `src/components/views/CompletedView.tsx`                                   | Searchable flat list of all completed tasks with cursor-based pagination                                                                          |
 | `src/store/todosApi.ts`                                                    | RTK Query endpoints -- `listActiveTasks`, `listInactiveTasks`, `listCompletedTasks`, `createTask`, `updateTask`, `deleteTask`, `batchUpdateTasks` |
 | `src/lib/dayjs.ts`                                                         | Date utilities -- `getWeekDays()`, `getMonthGrid()`, `isToday()`                                                                                  |
@@ -85,7 +86,7 @@ The `ParsedTaskFields` type (also in `src/lib/types.ts`) represents the structur
 6. The page renders a stacked layout: `TaskCreationForm` (full-width card) on top, a row containing `ViewSwitcher` and an optional category filter below, and then the active view.
 7. The active view is tracked in local state: `useState<View>('work')`. Defaults to the Work view.
 8. **Category filter:** A `SegmentedControl` next to the view switcher lets the user filter active tasks by category. Options are "All" plus every category from the user's profile. The filter is hidden when the Completed view is active (the Completed view has its own search). If the selected category is removed from the profile, the filter resets to "All". The filter applies to the `tasks` array passed to the Work and Week views only.
-9. The Work and Week views receive the filtered `tasks` array plus `onUpdate`, `onDelete`, `onEdit`, and `onBatchUpdate` callbacks. The **Completed view** is different: it receives `userId` directly and manages its own data fetching internally (it does not use the shared `listActiveTasks` data). It still receives `onUpdate`, `onDelete`, and `onEdit` callbacks so that task mutations route through the same `HomePage` handlers.
+9. Both the Work and Week views receive the filtered `tasks` array plus `onUpdate`, `onDelete`, `onEdit`, and `onBatchUpdate` callbacks. The Week view uses `onBatchUpdate` for drag-and-drop reordering, overdue bulk reschedule, and past-day column reschedule. The **Completed view** is different: it receives `userId` directly and manages its own data fetching internally (it does not use the shared `listActiveTasks` data). It still receives `onUpdate`, `onDelete`, and `onEdit` callbacks so that task mutations route through the same `HomePage` handlers.
 10. An `editingTask` state (`useState<Task | null>(null)`) tracks which task is currently being edited. When non-null, `EditTaskModal` is rendered conditionally at the bottom of the page layout.
 
 ### Task Creation
@@ -261,19 +262,20 @@ For deletion, the flow is: user clicks "Delete" -> "Confirm Delete" -> `EditTask
 
 **How `onEdit` propagates through the component tree:**
 
-- `HomePage` defines `handleEdit(task: Task)` and passes it as `onEdit` to both views
-- Each view (`WorkView`, `WeekView`) passes `onEdit` down to `TaskColumn` / `UnscheduledSection` / `WeekDayColumn`
-- `TaskColumn` passes `onEdit` to both `SortableTaskCard` (DnD mode) and `TaskCard` (static mode), and also to `DoneSection`
+- `HomePage` defines `handleEdit(task: Task)` and passes it as `onEdit` to all views
+- `WorkView` passes `onEdit` down to `TaskColumn` -> `SortableTaskCard` / `TaskCard` / `DoneSection`
+- `WeekView` passes `onEdit` down to `DndWeekDayColumn` -> `SortableTaskCard`, and to `OverdueSection` / `UnscheduledSection` -> `TaskCard` / `SortableTaskCard`
 - `SortableTaskCard` passes `onEdit` through to `TaskCard`
 - `TaskCard` renders a pencil icon (`PencilSimpleIcon`) that calls `onEdit()` on click
 
 ### Task Updates
 
-`TaskCard` (`src/components/tasks/TaskCard.tsx`) supports one inline update interaction:
+`TaskCard` (`src/components/tasks/TaskCard.tsx`) supports two inline update interactions:
 
 - **Checkbox toggle** -- Calls `onUpdate({ isDone: !task.isDone })`. The `updateTask` mutation patches the document and, because `isDone` is in the patch, invalidates both `ACTIVE_LIST` and `INACTIVE_LIST` tags.
+- **Reschedule** -- The `ReschedulePopover` appears on hover (right side of the card). Selecting a date shortcut or a calendar date calls `onUpdate({ dueDate })`. Selecting "No date" calls `onUpdate({ dueDate: null })`. See [ReschedulePopover](#reschedulepopover) for details.
 
-All other task property updates (title, description, category, priority, queue, due date) go through the [Edit Task Modal](#task-editing-edit-task-modal).
+All other task property updates (title, description, category, priority, queue) go through the [Edit Task Modal](#task-editing-edit-task-modal).
 
 In addition, the Work view supports **drag-and-drop updates** that can change a task's `queue`, `priority`, and `order` in a single operation. These go through `handleBatchUpdate` in `HomePage`, which calls `batchUpdateTasks({ userId, updates })`. See the [Work View](#work-view) section for details on the drag-and-drop architecture.
 
@@ -315,13 +317,16 @@ The Work view wraps its columns in a `DndContext` (from `@dnd-kit/core`) with `c
 - **PointerSensor** -- activated after 5px of movement (`activationConstraint: { distance: 5 }`) to avoid accidental drags on click
 - **KeyboardSensor** -- uses `sortableKeyboardCoordinates` for accessible keyboard-based reordering
 
-**Container ID scheme** (defined in `src/lib/dnd.ts`):
+**Container ID scheme** (defined in `src/lib/dnd.ts`). The Work view uses queue-based IDs; the Week view uses date-based IDs:
 
-| Pattern                      | Example                     | Meaning                          |
-| ---------------------------- | --------------------------- | -------------------------------- |
-| `column::<queue>`            | `column::day`               | A column container (ungrouped)   |
-| `group::<queue>::<priority>` | `group::day::P0 - Critical` | A priority group within a column |
-| `item::<taskId>`             | `item::task-abc123`         | A draggable task item            |
+| Pattern                              | Example                               | View | Meaning                               |
+| ------------------------------------ | ------------------------------------- | ---- | ------------------------------------- |
+| `column::<queue>`                    | `column::day`                         | Work | A queue column container (ungrouped)  |
+| `group::<queue>::<priority>`         | `group::day::P0 - Critical`          | Work | A priority group within a queue column |
+| `datecol::<date>`                    | `datecol::2026-02-16`                 | Week | A date column container (ungrouped)   |
+| `datecol::unscheduled`               | `datecol::unscheduled`                | Week | The unscheduled tasks container       |
+| `dategrp::<date>::<priority>`        | `dategrp::2026-02-16::P0 - Critical` | Week | A priority group within a date column |
+| `item::<taskId>`                     | `item::task-abc123`                   | Both | A draggable task item                 |
 
 Columns use `column::` IDs when no tasks have priorities; when any task in a column has a priority, that column's tasks are organized into `group::` containers instead. The `parseContainerId()`, `getQueueFromContainerId()`, and `getPriorityFromContainerId()` helpers extract queue/priority values from these IDs.
 
@@ -361,6 +366,11 @@ On drop, `computeUpdates()` iterates over affected containers and assigns **dens
 | `getColumnContainers(map, queue)`            | Returns all containers for a given queue, sorted by priority order                           |
 | `getOrCreateContainer(map, queue, priority)` | Finds or creates the correct container for a queue/priority combo                            |
 | `sortTasks(tasks)`                           | Sorts by `order` ascending (null last), then `createdAt` descending for null-order tasks     |
+| `buildDateColumnId(date)`                    | Builds a `datecol::<date>` container ID (`null` maps to `datecol::unscheduled`)              |
+| `buildDateGroupId(date, priority)`           | Builds a `dategrp::<date>::<priority>` container ID                                          |
+| `buildDateContainerMap(tasks, dates)`        | Creates date-based container map from tasks and visible date strings (used by Week view DnD) |
+| `getDateColumnContainers(map, date)`         | Returns all containers for a given date, sorted by priority order                            |
+| `getDateFromContainerId(id)`                 | Extracts date from a `datecol::` or `dategrp::` container ID                                |
 
 #### SortableTaskCard
 
@@ -378,15 +388,55 @@ Wraps a priority group's content with `useDroppable` (makes the group a valid dr
 
 **File:** `src/components/views/WeekView.tsx`
 
-A column grid layout showing the days of a navigable week, with a collapsible weekend section.
+A column grid layout showing the days of a navigable week, with drag-and-drop reordering, an overdue tasks section, and a collapsible weekend section.
 
 1. Local state tracks `weekOffset` (initialized to 0). `getWeekDays(dayjs().add(weekOffset, 'week'))` returns 7 dayjs objects starting from Monday of the target ISO week.
 2. The weekdays (Mon--Fri) are always shown in 5 columns. The weekend (Sat--Sun) is hidden behind a collapsible separator by default.
-3. Each column (`WeekDayColumn` component) filters tasks where `task.dueDate === toISODate(day)` and renders them as `TaskCard` components.
+3. Each column (`DndWeekDayColumn`, an internal component) filters tasks where `task.dueDate === toISODate(day)` and renders them as `SortableTaskCard` components within `SortableGroup` wrappers, supporting drag-and-drop reordering and cross-column moves.
 4. Today's column header is highlighted with `text-accent` styling.
-5. An `UnscheduledSection` appears above the columns, showing tasks where `dueDate` is null. This section is collapsible (starts collapsed) and hides entirely when empty.
-6. Navigation: prev/next week buttons (ghost `Button` with caret icons) and a "Today" button (outline, only shown when `weekOffset !== 0`) to return to the current week. The week range label (e.g., "Feb 9 -- Feb 15") is displayed between the navigation buttons.
+5. Above the columns, two collapsible sections appear side by side: an **Overdue section** (when overdue tasks exist) and an **Unscheduled section** (for tasks with no `dueDate`). Both start collapsed.
+6. Navigation: prev/next week buttons (ghost `IconButton` with caret icons, disabled during drag) and a "Today" button (outline, only shown when `weekOffset !== 0`, also disabled during drag) to return to the current week. The week range label (e.g., "Feb 9 -- Feb 15") is displayed between the navigation buttons.
 7. The weekend separator is a clickable vertical divider that toggles `isWeekendExpanded`. When collapsed, it shows a vertical "Weekend" label and a badge with the weekend task count (if > 0). When expanded, the separator shows a collapse caret and the two weekend day columns appear.
+
+#### Overdue Section
+
+An `OverdueSection` component (internal to `WeekView.tsx`) shows tasks that are past due and not visible in the current week grid. The filter criteria: `!isDone && dueDate !== null && dueDate < today && dueDate not in the current week's visible dates`.
+
+- **Collapsible**: starts collapsed, toggled via a caret icon button. Shows the count next to the "Overdue" label.
+- **Bulk reschedule**: A `ReschedulePopover` (using the `trigger` prop for a custom icon button) appears next to the header. Selecting a date calls `onBatchUpdate` with all overdue task IDs mapped to the selected date.
+- **Static list**: No drag-and-drop. Tasks render as plain `TaskCard` components in a flex-wrap layout.
+- **Hidden when empty**: The section is not rendered at all when there are zero overdue tasks.
+
+#### Past-Day Column Reschedule
+
+Past-day column headers (where `day.isBefore(today, 'day')`) show a reschedule button (`ClockClockwiseIcon` via `ReschedulePopover` with `trigger` prop) when they have non-done tasks (`totalCount > 0`). Selecting a date calls `onBatchUpdate` with all non-done tasks in that column mapped to the selected date. This allows quick bulk rescheduling of tasks left in yesterday's or earlier columns.
+
+#### Drag-and-Drop Architecture (Week View)
+
+The Week view wraps its columns in a `DndContext` (from `@dnd-kit/core`) with `closestCenter` collision detection and the same two sensors as the Work view:
+
+- **PointerSensor** -- activated after 5px of movement
+- **KeyboardSensor** -- uses `sortableKeyboardCoordinates`
+
+**Date-based container ID scheme** (defined in `src/lib/dnd.ts`):
+
+| Pattern                              | Example                               | Meaning                              |
+| ------------------------------------ | ------------------------------------- | ------------------------------------ |
+| `datecol::<date>`                    | `datecol::2026-02-16`                 | A date column container (ungrouped)  |
+| `datecol::unscheduled`               | `datecol::unscheduled`                | The unscheduled tasks container      |
+| `dategrp::<date>::<priority>`        | `dategrp::2026-02-16::P0 - Critical` | A priority group within a date column |
+
+These are separate from the Work view's `column::` and `group::` prefixes. The `buildDateColumnId()`, `buildDateGroupId()`, `buildDateContainerMap()`, `getDateColumnContainers()`, and `getDateFromContainerId()` helpers in `src/lib/dnd.ts` manage these IDs.
+
+**Container map:** `buildDateContainerMap(tasks, visibleDates)` creates the initial container map from the task list and visible date strings (including `null` for unscheduled). On drag, the container map is updated optimistically in local `dragState`.
+
+**Event flow** mirrors the Work view pattern:
+
+1. **`handleDragStart`** -- Snapshots the container map via `buildDateContainerMap()` and identifies the active task.
+2. **`handleDragOver`** -- Moves the task ID between containers. When dropping on a `datecol::` that has `dategrp::` sub-containers, redirects to the "No priority" group.
+3. **`handleDragEnd`** -- Finalizes position and calls `computeWeekUpdates()` to build a batch update array containing `dueDate`, `priority`, and `order` patches. Only changed fields are included.
+
+**`DragOverlay`** renders the same rotated, elevated `TaskCard` clone (`rotate-[2deg] opacity-95 shadow-lg`) as the Work view.
 
 ### Completed View
 
@@ -426,9 +476,11 @@ A vertical column with a header (title + task count) and a scrollable list of ta
 
 **Dual-mode rendering:** TaskColumn operates in one of two modes, selected via a discriminated union prop type:
 
-1. **Static mode** (`tasks` prop) -- Used by WeekView. Renders plain `TaskCard` components. When any task has a non-null `priority`, activates priority grouping via a local `groupByPriority()` helper. Tasks are grouped by `Priority` value, sorted by `PRIORITIES` index (P0 first, null last). Group labels are the full priority string (e.g., "P0 - Critical") or "No priority". When no tasks have a priority set, grouping is skipped and tasks render as a flat list.
+1. **Static mode** (`tasks` prop) -- Renders plain `TaskCard` components. When any task has a non-null `priority`, activates priority grouping via a local `groupByPriority()` helper. Tasks are grouped by `Priority` value, sorted by `PRIORITIES` index (P0 first, null last). Group labels are the full priority string (e.g., "P0 - Critical") or "No priority". When no tasks have a priority set, grouping is skipped and tasks render as a flat list.
 
 2. **DnD mode** (`groups` + `queue` + `totalCount` props) -- Used by WorkView. The `groups` prop is an array of `TaskColumnGroup` objects, each containing a `containerId`, `label`, `tasks`, and `itemIds`. Each group is wrapped in a `SortableGroup` component (which provides `useDroppable` + `SortableContext`), and tasks are rendered as `SortableTaskCard` components. Empty groups show a "Drop here" dashed placeholder. The column itself is also a droppable target (via `useDroppable` on the column ID) to allow drops into empty columns.
+
+Note: The `TaskColumnGroup` type is also used by WeekView's internal `DndWeekDayColumn` component, even though WeekView does not use `TaskColumn` directly.
 
 **Done section:** Both modes accept an optional `doneTasks` prop (an array of completed `Task` objects). When provided and non-empty, a `DoneSection` component renders below the active task list. `DoneSection` displays a border divider (`border-t`), a collapsible "Done (N)" label with a caret toggle (`CaretRightIcon` that rotates 90 degrees when expanded), and plain `TaskCard` components (no drag handles). The done section **starts collapsed** by default -- users must click the header to reveal completed tasks. Done tasks retain their existing `isDone` styling (strikethrough, muted text) and include an edit button for opening the Edit Task Modal. See the [Work View Done Sublist](#done-sublist) section for the full data flow.
 
@@ -445,7 +497,13 @@ The `TaskColumnGroup` type is exported from this file:
 
 **File:** `src/components/tasks/UnscheduledSection.tsx`
 
-A collapsible section that renders tasks with no `dueDate`. Uses `CaretDownIcon` / `CaretRightIcon` for the toggle indicator. Starts collapsed by default. Returns `null` when there are no unscheduled tasks (does not render at all).
+A collapsible section that renders tasks with no `dueDate`. Uses `CaretDownIcon` / `CaretRightIcon` for the toggle indicator. Starts collapsed by default.
+
+**Dual-mode rendering:** UnscheduledSection operates in one of two modes, selected via a discriminated union prop type:
+
+1. **Static mode** (`mode?: 'static'`, with `tasks` prop) -- Renders plain `TaskCard` components in a flex-wrap layout. Returns `null` when there are no unscheduled tasks (does not render at all).
+
+2. **DnD mode** (`mode: 'dnd'`, with `groups` + `columnId` + `totalCount` props) -- Used by WeekView. The section wraps its content in a `useDroppable` container and renders `SortableGroup` + `SortableTaskCard` components, enabling drag-and-drop reordering and cross-container moves. Always renders in DnD mode (even when empty, to serve as a drop target).
 
 ### ViewSwitcher
 
@@ -469,12 +527,68 @@ An interactive card displaying a single task. Layout:
 
 - **Far left (DnD mode only):** Drag handle (`DotsSixVerticalIcon`), visible on hover with `cursor-grab` / `cursor-grabbing` states. Only rendered when `dragHandleListeners` prop is provided.
 - **Left:** Checkbox for toggling `isDone`
-- **Center:** Task title (with strikethrough when done), optional description preview (truncated, one line), and optional metadata row showing category (`TagIcon` + label) and priority (`Pill` with short label like "P0"). The metadata row is separated by a top border and only rendered when category or priority is non-null.
-- **Right (hover-only):** Edit button (`PencilSimpleIcon`) that calls `onEdit()` to open the Edit Task Modal
+- **Center:** Task title (with strikethrough when done), optional description preview (truncated, one line), and optional metadata row showing category (`TagIcon` + label), due date (`CalendarBlankIcon` + relative date), completed-at timestamp (`CheckCircleIcon` + relative time), and priority (`Pill` with short label like "P0"). The metadata row only renders when any metadata field is non-null.
+- **Right (hover-only):** Reschedule button (`ClockClockwiseIcon`) that opens `ReschedulePopover`, and edit button (`PencilSimpleIcon`) that calls `onEdit()` to open the Edit Task Modal
 
-The edit button uses `opacity-0 group-hover:opacity-100` with `transition-smooth` for a fade-in effect, and is also visible on keyboard focus (`focus-visible:opacity-100`).
+Both hover-only buttons use `opacity-0 group-hover:opacity-100` with `transition-smooth` for a fade-in effect, and are also visible on keyboard focus (`focus-visible:opacity-100`). The reschedule button stays visible while its popover is open.
 
 **Drag-and-drop props:** TaskCard accepts optional `isDragging`, `dragHandleListeners`, and `dragHandleAttributes` props. When `isDragging` is true, the card renders with `border-dashed opacity-50` as a placeholder. These props are passed through from `SortableTaskCard` in DnD contexts (Work view) and omitted in static contexts (Week view, Done sections).
+
+### ReschedulePopover
+
+**File:** `src/components/tasks/ReschedulePopover.tsx`
+
+An inline date-reschedule control that combines date shortcuts with a full calendar grid, rendered inside a `Popover` (from the design system). It is used in `TaskCard` for single-task rescheduling and in `WeekView` for bulk rescheduling of overdue and past-day column tasks.
+
+**Props:**
+
+| Prop        | Type                                  | Default | Description                                                                  |
+| ----------- | ------------------------------------- | ------- | ---------------------------------------------------------------------------- |
+| `dueDate`   | `string \| null`                      | `null`  | Current due date (`YYYY-MM-DD` or null); optional, defaults to `null`        |
+| `onSelect`  | `(dueDate: string \| null) => void`   | --      | Called when the user picks a date or clears the date                         |
+| `trigger`   | `React.ReactNode`                     | --      | Optional custom trigger element; when provided, replaces the default trigger |
+| `className` | `string`                              | --      | Additional classes for the default trigger button                            |
+
+**Default trigger:** An `IconButton` (ghost, xs) with a `ClockClockwiseIcon`. In `TaskCard`, the button is hidden by default and revealed on card hover via `opacity-0 group-hover:opacity-100`. It remains visible while the popover is open.
+
+**Custom trigger:** When a `trigger` prop is provided, the custom element is wrapped in a `<button>` that toggles the popover on click. This is used by the Week view's overdue section and past-day column headers, which supply their own `IconButton` as the trigger.
+
+**Popover content** (top to bottom):
+
+1. **Date shortcuts** -- A list of contextual quick-pick buttons:
+
+   | Shortcut         | Target date                                                                      | Shown when         |
+   | ---------------- | -------------------------------------------------------------------------------- | ------------------ |
+   | Today            | Today                                                                            | Always             |
+   | Tomorrow         | Tomorrow                                                                         | Always             |
+   | Later this week  | Wednesday (if Mon/Tue) or Friday (if Wed/Thu)                                     | Mon--Thu only      |
+   | Weekend          | This Saturday                                                                    | Mon--Fri only      |
+   | Next week        | Next Monday                                                                      | Always             |
+
+   Each shortcut shows its label on the left and the resolved date (e.g., "Wed, Feb 18") on the right. The shortcut matching the current `dueDate` is highlighted with `bg-accent text-text-inverse`. Shortcuts are computed via `getShortcuts()` using dayjs ISO week helpers.
+
+2. **Divider** -- A thin `border-t` separator.
+
+3. **Calendar grid** -- A month calendar identical in structure to `DateInput`'s calendar popup:
+   - Month navigation via prev/next `IconButton` (ghost, xs) with `CaretLeftIcon` / `CaretRightIcon`
+   - Month/year label centered between the nav buttons
+   - Day-of-week headers (Mon--Sun, 10px text)
+   - 6-row x 7-column grid generated by `getMonthGrid()` from `src/lib/dayjs.ts`
+   - Today highlighted with `text-accent-text font-medium`; selected date highlighted with `bg-accent text-text-inverse`; out-of-month dates use `text-text-disabled`
+   - Each cell has `aria-label` with the full date (e.g., "February 18, 2026")
+
+**Calendar initialization:** When the popover opens, the calendar resets to show the month of the current `dueDate` (or today if no due date is set).
+
+**Selection behavior:** Picking any shortcut or calendar date calls `onSelect(dateString)` and closes the popover. The "No date" option calls `onSelect(null)`.
+
+**Dependencies:**
+
+| Import                    | Source                             |
+| ------------------------- | ---------------------------------- |
+| `Popover`                 | `@/components/common/Popover`     |
+| `IconButton`              | `@/components/common/IconButton`  |
+| `getMonthGrid`, `isToday`, `toISODate` | `@/lib/dayjs`          |
+| `ClockClockwiseIcon`, `CaretLeftIcon`, `CaretRightIcon`, `XIcon` | `@phosphor-icons/react` |
 
 ## RTK Query Endpoints
 
@@ -560,17 +674,25 @@ The SmartInput component also applies inline styles via Tiptap's `editorProps.at
 - **The "one month" threshold is computed at query time.** `dayjs().subtract(1, 'month').valueOf()` is evaluated when the query runs, not stored on the task. This means the boundary shifts forward over time -- a task completed 29 days ago is active today but may become inactive tomorrow.
 - **Composite Firestore indexes are required.** The active/inactive queries filter on `isDone` and sort/filter on `updatedAt` or `createdAt`, which requires composite indexes. These are defined in `firestore.indexes.json`: `isDone + updatedAt` (descending) and `isDone + createdAt` (descending).
 - **Done tasks are excluded from drag-and-drop.** In the Work view, `buildContainerMap()` and `computeColumnGroups()` both filter out `isDone: true` tasks, so they never participate in the DnD system. Done tasks appear in a collapsible "Done" section at the bottom of each column (collapsed by default) and can interact via the checkbox (to uncheck) or the edit button (to open the Edit Task Modal).
-- **Drag-and-drop is Work view only.** The Week view uses the static (non-DnD) `TaskColumn` mode. Only the Work view wraps columns in a `DndContext`.
+- **Both Work and Week views support drag-and-drop.** Both views wrap their columns in a `DndContext`. The Work view uses queue-based containers (`column::`, `group::`) while the Week view uses date-based containers (`datecol::`, `dategrp::`). The Completed view has no drag-and-drop.
 - **Drag activation requires 5px of movement.** The `PointerSensor` has a `distance: 5` activation constraint. This prevents accidental drags when clicking buttons (checkbox, edit) inside the card.
 - **Dense integer ordering.** On every drop, all tasks in affected containers receive fresh dense integer `order` values (0, 1, 2, ...). Tasks that have never been reordered have `order: null`, which sorts after all ordered tasks (falling back to `createdAt` descending).
 - **Optimistic batch updates.** The `batchUpdateTasks` mutation patches the RTK Query cache immediately on drag end, so the UI never flickers. If the Firestore write fails, the cache is rolled back automatically.
 - **Cross-container drops to grouped columns.** When dragging a task into a column that uses priority groups, the task lands in the group matching its current priority. If dropped on the column itself (not a specific group), it lands in the "No priority" group.
 - **Priority groups are created dynamically.** If a task is dragged into a column where its priority group does not yet exist, the group is created on-the-fly in the container map.
-- **Week view has navigation.** `weekOffset` state (default 0) shifts the displayed week forward or backward. A "Today" button resets to the current week. The weekend columns are collapsible and hidden by default.
+- **Week view has navigation.** `weekOffset` state (default 0) shifts the displayed week forward or backward. A "Today" button resets to the current week. The weekend columns are collapsible and hidden by default. Navigation buttons are disabled during drag operations.
 - **Unscheduled tasks** in the Week view are tasks where `dueDate` is `null`. This is different from the Work view's "Backlog" column, which filters on `queue === null`.
+- **Overdue tasks** in the Week view are tasks where `dueDate < today && !isDone` AND the `dueDate` is not one of the visible week dates. This means a task due last Monday that appears in the visible week grid (when navigated to that week) is shown in its column, not in the overdue section. The overdue section only catches tasks from weeks not currently displayed.
+- **Overdue section hidden when empty.** The overdue section is not rendered at all when there are zero overdue tasks. Unlike the unscheduled section (which always renders in DnD mode as a drop target), the overdue section is purely informational.
+- **Overdue bulk reschedule updates `dueDate` only.** The batch update from the overdue section's `ReschedulePopover` sets `dueDate` on all overdue tasks but does not change `queue` or `priority`.
+- **Past-day column reschedule** only appears when the column has non-done tasks (`totalCount > 0`) and the day is before today. The reschedule button uses the `ReschedulePopover` with a custom `trigger` prop.
+- **Week view drag-and-drop uses date-based containers.** The Week view's DnD system uses `datecol::` and `dategrp::` container IDs (from `src/lib/dnd.ts`) instead of the Work view's `column::` and `group::` IDs. Dragging a task between day columns changes its `dueDate`. Dragging between priority groups changes its `priority`. Both update `order` for affected containers.
+- **Week view DnD includes unscheduled column.** The unscheduled section participates in the Week view's DnD context (via `mode="dnd"` on `UnscheduledSection`), allowing tasks to be dragged between day columns and the unscheduled area.
 - **Completed view manages its own task list.** Unlike Work/Week (which share the `listActiveTasks` data from `HomePage`), the Completed view calls `useLazyListCompletedTasksQuery` and stores results in local component state. This means uncompleting or deleting a task requires optimistic removal from the local list (`setTasks(prev => prev.filter(...))`) in addition to dispatching the mutation via the parent callbacks.
 - **Completed view search is client-side only.** The search filters the already-fetched tasks in memory. If the user has loaded 100 tasks and searches for a term that only matches task #200, they will not find it until they paginate further. The "Load more" button is hidden during search to avoid cursor misalignment.
 - **Category filter is hidden on the Completed tab.** The Completed view has its own search input, so the category filter `SegmentedControl` next to the `ViewSwitcher` is conditionally hidden when `activeView === 'completed'`.
+- **Reschedule updates only `dueDate`.** The `ReschedulePopover` calls `onSelect(dueDate)` which routes to `onUpdate({ dueDate })` for single tasks or `onBatchUpdate([...])` for bulk operations. It does not auto-derive `queue` from the new date. Queue assignment only happens during task creation (via `TaskCreationForm`). To change both `dueDate` and `queue`, use the Edit Task Modal.
+- **Reschedule shortcuts are context-aware.** "Later this week" and "Weekend" options are hidden on days when they would not make sense (e.g., "Weekend" is hidden on Saturday/Sunday, "Later this week" is hidden Friday--Sunday). The shortcuts are computed once per popover open via `useMemo`.
 - **Edit modal only sends changed fields.** The `EditTaskModal` diffs form values against the original task and only includes fields that actually changed in the `Partial<Task>` update. If the user opens the modal and clicks "Save" without changing anything, no mutation is dispatched.
 - **Edit modal delete requires confirmation.** Clicking "Delete" in the modal does not immediately delete the task. The footer switches to a confirmation state with "Cancel" and "Confirm Delete" buttons. This two-step flow prevents accidental deletions.
 - **Edit modal category autocomplete uses `TextSuggestion`.** Unlike the SmartInput's Tiptap-based suggestion system, the edit modal uses the `TextSuggestion` component (a plain text input with a dropdown) for category autocomplete. The suggestions come from the same `profile.categories` data.

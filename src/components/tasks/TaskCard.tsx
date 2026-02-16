@@ -10,6 +10,7 @@ import {
 
 import IconButton from '@/components/common/IconButton'
 import Pill from '@/components/common/Pill'
+import ReschedulePopover from '@/components/tasks/ReschedulePopover'
 import cn from '@/lib/classnames'
 import dayjs, { fromISODate, isToday } from '@/lib/dayjs'
 import type { Color, Priority, Task } from '@/lib/types'
@@ -138,15 +139,21 @@ export default function TaskCard(props: TaskCardProps) {
         )}
       </div>
 
-      <IconButton
-        variant="ghost"
-        size="xs"
-        label="Edit task"
-        onClick={onEdit}
-        className="tooltip-end shrink-0 self-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-      >
-        <PencilSimpleIcon size={16} />
-      </IconButton>
+      <div className="stack shrink-0 justify-center gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100">
+        <IconButton
+          variant="ghost"
+          size="xs"
+          label="Edit task"
+          onClick={onEdit}
+          className="tooltip-end"
+        >
+          <PencilSimpleIcon size={16} />
+        </IconButton>
+        <ReschedulePopover
+          dueDate={task.dueDate}
+          onSelect={(date) => onUpdate({ dueDate: date })}
+        />
+      </div>
     </div>
   )
 }

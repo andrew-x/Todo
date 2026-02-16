@@ -8,7 +8,7 @@ paths:
 
 ## Dark Theme (dark-only)
 
-The app uses a dark-only theme defined in `src/styles/index.css` via Tailwind v4's `@theme` directive. Custom utility classes are in `src/styles/utilities.css`. All color values come from Tailwind's built-in zinc and indigo oklch palettes.
+The app uses a dark-only theme defined in `src/styles/index.css` via Tailwind's `@theme` directive. Custom utility classes are in `src/styles/utilities.css`. All color values come from Tailwind's built-in zinc and indigo oklch palettes.
 
 ## Typography
 

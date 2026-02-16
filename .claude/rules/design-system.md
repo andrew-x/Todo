@@ -24,6 +24,7 @@ paths:
 | `TextSuggestion`   | `TextSuggestion.tsx`   | `size`: xs–xl · `suggestions` · `onSelect` · `label` · `error` · controlled & uncontrolled · combobox dropdown with keyboard nav |
 | `Modal`            | `Modal.tsx`            | `size`: sm, md, lg · `open` / `onClose` · `title` · `footer` · portal to body · Escape/backdrop close · scroll lock              |
 | `IconButton`       | `IconButton.tsx`       | `variant`: default–link · `size`: xs–xl · `label` (required, tooltip + aria-label) · `isLoading`                                 |
+| `Popover`          | `Popover.tsx`          | `trigger` · `children` · `open` / `onOpenChange` · `align`: start, end · click-outside + Escape close · flip-up detection       |
 | `SegmentedControl` | `SegmentedControl.tsx` | Generic `<T extends string>` · `options` (value, label, icon?) · `value` / `onChange` · `size`: xs–xl · tablist a11y             |
 
 ## Size Scale

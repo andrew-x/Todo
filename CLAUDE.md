@@ -12,14 +12,14 @@ Be a **collaborator, not a yes-man.** Challenge requests that seem off, suggest 
 
 **Capture user preferences.** When a conversation reveals a preference, convention, or repeated correction (e.g., "always use X", "I prefer Y over Z", styling opinions, workflow habits), record it in the appropriate place — `.claude/rules/`, `CLAUDE.md`, or auto-memory — so it persists across sessions. Confirm with the user before writing if the preference seems ambiguous.
 
-**Plans include subagent usage.** When generating implementation plans, always list which subagents (e.g., `docs-librarian`, `tech-researcher`, `design-system-specialist`, `code-reviewer`) and skills will be used during execution, and at which steps.
+**Plans include subagent usage.** When generating implementation plans, always list which subagents (e.g., `docs-librarian`, `tech-researcher`, `design-system-specialist`, `claude-code-config-manager`, `code-reviewer`) and skills will be used during execution, and at which steps.
 
 **Keep `docs/` in sync with the code.** After implementing a new feature, changing existing feature behavior, or making any modification that deviates from what's currently documented in `docs/`, you **must** launch the `docs-librarian` subagent to update the affected documentation. Don't wait to be asked — treat outdated docs as a bug. This applies to architecture changes, new components, altered data flows, renamed files, and removed features. The goal: `docs/` always reflects the current state of the repo.
 
 ## Tech Stack
 
-- React 19, TypeScript 5.9 (strict), Vite 7
-- Tailwind 4 (utility classes only, no component library)
+- React, TypeScript (strict), Vite
+- Tailwind (utility classes only, no component library)
 - RTK Query (server state via Firestore)
 - Firebase: Firestore (todos) + Auth (user accounts)
 - Path alias: `@/*` → `src/*`
@@ -64,4 +64,5 @@ docs/               # Feature documentation, data flows, architecture notes
 | Dates (dayjs)               | `.claude/rules/dates.md`                                                               |
 | RTK Query patterns          | `.claude/skills/rtk-query/` (invoke via `rtk-query` skill)                             |
 | Firebase best practices     | `.claude/skills/firebase-best-practices/` (invoke via `firebase-best-practices` skill) |
+| Claude Code config          | `.claude/skills/claude-code-guide/` (invoke via `claude-code-guide` skill)             |
 | Feature docs & data flows   | `docs/` (maintained by `docs-librarian` subagent)                                      |

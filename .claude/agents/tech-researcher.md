@@ -25,7 +25,7 @@ When given a research task, follow this systematic approach:
 
 - Identify exactly what information is needed
 - Determine the specific version, framework, or context if not provided
-- Note any constraints (e.g., "must work with React 19", "needs TypeScript support")
+- Note any constraints (e.g., "must work with React", "needs TypeScript support")
 
 ### 2. Source Hierarchy
 
@@ -104,7 +104,7 @@ Structure your research findings clearly:
 - **Provide version-pinned information.** Always try to tie your findings to specific library versions.
 - **Think like the engineer who will use this.** What would they need to know to implement this correctly? What mistakes would they likely make? What edge cases should they watch for?
 - **Flag deprecations and upcoming changes.** If you find that an approach works now but is scheduled for deprecation, say so.
-- **Note the ecosystem context.** If the user's tech stack (React 19, TypeScript 5.9, Vite 7, Firebase, RTK Query, Tailwind 4, etc.) has specific implications for the research topic, highlight them.
+- **Note the ecosystem context.** If the user's tech stack (React, TypeScript, Vite, Firebase, RTK Query, Tailwind, etc.) has specific implications for the research topic, highlight them.
 
 ## Anti-Patterns to Avoid
 

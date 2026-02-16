@@ -12,11 +12,17 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core'
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
-import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react'
+import {
+  CaretDownIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+  ClockClockwiseIcon,
+} from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 
 import Button from '@/components/common/Button'
 import IconButton from '@/components/common/IconButton'
+import ReschedulePopover from '@/components/tasks/ReschedulePopover'
 import SortableGroup from '@/components/tasks/SortableGroup'
 import SortableTaskCard from '@/components/tasks/SortableTaskCard'
 import TaskCard from '@/components/tasks/TaskCard'
@@ -211,18 +217,22 @@ function DndWeekDayColumn({
   groups,
   totalCount,
   isToday: today,
+  isPast,
   onUpdate,
   onDelete,
   onEdit,
+  onBulkReschedule,
 }: {
   title: string
   columnId: string
   groups: TaskColumnGroup[]
   totalCount: number
   isToday?: boolean
+  isPast?: boolean
   onUpdate: (id: string, updates: Partial<Task>) => void
   onDelete: (id: string) => void
   onEdit: (task: Task) => void
+  onBulkReschedule?: (dueDate: string) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: columnId })
 
@@ -244,6 +254,18 @@ function DndWeekDayColumn({
           {title}
         </h3>
         <span className="text-text-tertiary text-xs">{totalCount}</span>
+        {isPast && totalCount > 0 && onBulkReschedule && (
+          <ReschedulePopover
+            onSelect={(date) => {
+              if (date) onBulkReschedule(date)
+            }}
+            trigger={
+              <IconButton variant="ghost" size="xs" label="Reschedule all">
+                <ClockClockwiseIcon size={14} />
+              </IconButton>
+            }
+          />
+        )}
       </div>
       <div className="stack flex-1 gap-2 overflow-y-auto">
         {groups.map((group) => (
@@ -278,6 +300,68 @@ function DndWeekDayColumn({
           </SortableGroup>
         ))}
       </div>
+    </div>
+  )
+}
+
+// --- Overdue section (no DnD, static list with bulk reschedule) ---
+
+function OverdueSection({
+  tasks,
+  onUpdate,
+  onDelete,
+  onEdit,
+  onBulkReschedule,
+  className,
+}: {
+  tasks: Task[]
+  onUpdate: (id: string, updates: Partial<Task>) => void
+  onDelete: (id: string) => void
+  onEdit: (task: Task) => void
+  onBulkReschedule: (dueDate: string) => void
+  className?: string
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <div className={cn('border-border-default mb-4 border-b pb-4', className)}>
+      <div className="mb-2 flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+          className="text-text-secondary transition-smooth hover:text-text-primary focus-ring flex cursor-pointer items-center gap-1.5 text-sm font-medium"
+        >
+          {isOpen ? <CaretDownIcon size={14} /> : <CaretRightIcon size={14} />}
+          Overdue
+          <span className="text-text-tertiary text-xs">{tasks.length}</span>
+        </button>
+        <ReschedulePopover
+          onSelect={(date) => {
+            if (date) onBulkReschedule(date)
+          }}
+          trigger={
+            <IconButton variant="ghost" size="xs" label="Reschedule all">
+              <ClockClockwiseIcon size={14} />
+            </IconButton>
+          }
+        />
+      </div>
+
+      {isOpen && (
+        <div className="flex flex-wrap gap-2">
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onUpdate={(updates) => onUpdate(task.id, updates)}
+              onDelete={() => onDelete(task.id)}
+              onEdit={() => onEdit(task)}
+              className="w-full"
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -515,6 +599,26 @@ export default function WeekView({
     setDragState(null)
   }
 
+  // --- Overdue tasks ---
+
+  const todayStr = toISODate(dayjs())
+  const allVisibleDates = useMemo(
+    () => weekDays.map((d) => toISODate(d)),
+    [weekDays],
+  )
+
+  const overdueTasks = useMemo(
+    () =>
+      tasks.filter(
+        (t) =>
+          !t.isDone &&
+          t.dueDate !== null &&
+          t.dueDate < todayStr &&
+          !allVisibleDates.includes(t.dueDate),
+      ),
+    [tasks, todayStr, allVisibleDates],
+  )
+
   // --- Render ---
 
   const weekdaySlice = weekDays.slice(0, 5)
@@ -528,15 +632,30 @@ export default function WeekView({
       onDragEnd={handleDragEnd}
     >
       <div className="stack flex-1">
-        <UnscheduledSection
-          mode="dnd"
-          groups={getColumnGroups(null)}
-          columnId={buildDateColumnId(null)}
-          totalCount={getColumnCount(null)}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-          onEdit={onEdit}
-        />
+        <div className="flex gap-4">
+          {overdueTasks.length > 0 && (
+            <OverdueSection
+              tasks={overdueTasks}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              onEdit={onEdit}
+              onBulkReschedule={(dueDate) =>
+                onBatchUpdate(overdueTasks.map((t) => ({ id: t.id, dueDate })))
+              }
+              className="flex-1"
+            />
+          )}
+          <UnscheduledSection
+            mode="dnd"
+            groups={getColumnGroups(null)}
+            columnId={buildDateColumnId(null)}
+            totalCount={getColumnCount(null)}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+            onEdit={onEdit}
+            className="flex-1"
+          />
+        </div>
 
         <div className="mb-4 flex items-center gap-3">
           <IconButton
@@ -581,6 +700,7 @@ export default function WeekView({
           {weekdaySlice.map((day) => {
             const dateStr = toISODate(day)
             const today = isToday(day)
+            const isPast = day.isBefore(dayjs(), 'day')
 
             return (
               <DndWeekDayColumn
@@ -590,9 +710,17 @@ export default function WeekView({
                 groups={getColumnGroups(dateStr)}
                 totalCount={getColumnCount(dateStr)}
                 isToday={today}
+                isPast={isPast}
                 onUpdate={onUpdate}
                 onDelete={onDelete}
                 onEdit={onEdit}
+                onBulkReschedule={(dueDate) =>
+                  onBatchUpdate(
+                    tasks
+                      .filter((t) => t.dueDate === dateStr && !t.isDone)
+                      .map((t) => ({ id: t.id, dueDate })),
+                  )
+                }
               />
             )
           })}
@@ -635,6 +763,7 @@ export default function WeekView({
             weekendDays.map((day) => {
               const dateStr = toISODate(day)
               const today = isToday(day)
+              const isPast = day.isBefore(dayjs(), 'day')
 
               return (
                 <DndWeekDayColumn
@@ -644,9 +773,17 @@ export default function WeekView({
                   groups={getColumnGroups(dateStr)}
                   totalCount={getColumnCount(dateStr)}
                   isToday={today}
+                  isPast={isPast}
                   onUpdate={onUpdate}
                   onDelete={onDelete}
                   onEdit={onEdit}
+                  onBulkReschedule={(dueDate) =>
+                    onBatchUpdate(
+                      tasks
+                        .filter((t) => t.dueDate === dateStr && !t.isDone)
+                        .map((t) => ({ id: t.id, dueDate })),
+                    )
+                  }
                 />
               )
             })}

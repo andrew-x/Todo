@@ -1,10 +1,10 @@
 # Design System
 
-> Reusable UI components in `src/components/common/`. All components use CVA for type-safe variants, the `cn` utility for class merging, and the project's semantic color tokens. This is the foundation for building consistent, accessible UI across the app. Components: Button, IconButton, TextInput, TextArea, Pill, PillInput, Select, DateInput, TextSuggestion, Modal.
+> Reusable UI components in `src/components/common/`. All components use CVA for type-safe variants, the `cn` utility for class merging, and the project's semantic color tokens. This is the foundation for building consistent, accessible UI across the app. Components: Button, IconButton, TextInput, TextArea, Pill, PillInput, Select, DateInput, TextSuggestion, Modal, Popover.
 
 ## Overview
 
-The design system provides ten components that cover the most common interactive UI needs: buttons (text and icon-only), text inputs, textareas, tags/badges, multi-value tag inputs, a select dropdown, a date picker, an autocomplete text input, and a modal dialog. They share consistent patterns, follow accessibility best practices, and are styled exclusively with the semantic tokens defined in the [theme](../src/styles/index.css).
+The design system provides eleven components that cover the most common interactive UI needs: buttons (text and icon-only), text inputs, textareas, tags/badges, multi-value tag inputs, a select dropdown, a date picker, an autocomplete text input, a modal dialog, and a popover. They share consistent patterns, follow accessibility best practices, and are styled exclusively with the semantic tokens defined in the [theme](../src/styles/index.css).
 
 Components are not exported through a barrel file. Import each component directly from its file:
 
@@ -15,6 +15,7 @@ import IconButton from '@/components/common/IconButton'
 import Modal from '@/components/common/Modal'
 import Pill from '@/components/common/Pill'
 import PillInput from '@/components/common/PillInput'
+import Popover from '@/components/common/Popover'
 import Select from '@/components/common/Select'
 import TextArea from '@/components/common/TextArea'
 import TextInput from '@/components/common/TextInput'
@@ -403,6 +404,45 @@ A dialog overlay rendered via `createPortal` to `document.body`. Supports an opt
 - Uses CVA for size variants, consistent with other design system components.
 - Unlike input components, Modal does not use `useId()`, labels, or error states -- it follows a different pattern as an overlay component.
 
+### Popover
+
+**File:** `src/components/common/Popover.tsx`
+
+A controlled popover that positions floating content relative to a trigger element. Unlike Modal, which overlays the entire viewport, Popover renders inline content anchored to its trigger with automatic flip-up detection when there is not enough room below.
+
+**Props:**
+
+| Prop           | Type                        | Default   | Description                                                  |
+| -------------- | --------------------------- | --------- | ------------------------------------------------------------ |
+| `trigger`      | `React.ReactNode`           | --        | The element that visually anchors the popover                |
+| `children`     | `React.ReactNode`           | --        | Content rendered inside the floating panel                   |
+| `open`         | `boolean`                   | --        | Controls visibility (when `false`, panel is not rendered)    |
+| `onOpenChange` | `(open: boolean) => void`   | --        | Called on close events (click outside, Escape key)           |
+| `align`        | `'start' \| 'end'`          | `'start'` | Horizontal alignment -- `start` aligns left, `end` aligns right |
+| `className`    | `string`                    | --        | Additional classes applied to the floating panel             |
+
+**Flip-up detection:** When the popover opens, it measures the distance from the trigger's bottom edge to the viewport bottom. If a panel of estimated height (360px) would overflow, the panel renders above the trigger (`bottom-full mb-1`) instead of below (`top-full mt-1`). This measurement runs on every open via a `useEffect`.
+
+**Close mechanisms:**
+
+1. **Click outside** -- a `mousedown` listener on `document` checks if the click target is outside `containerRef` and calls `onOpenChange(false)`
+2. **Escape key** -- a `keydown` listener on `document` calls `onOpenChange(false)` when Escape is pressed
+
+Both listeners are registered only while `open` is `true` and cleaned up when the popover closes.
+
+**Visual structure:**
+
+- **Container:** `relative` positioned `<div>` wrapping both trigger and panel
+- **Panel:** `absolute z-50`, `bg-bg-overlay` background, `border-border-default` border, `rounded-md`, `shadow-lg`
+- **Alignment:** `left-0` for `start`, `right-0` for `end`
+
+**Implementation notes:**
+
+- Popover does not use CVA -- it has no size or variant system. Sizing and padding are controlled entirely by the `className` prop and the content rendered as `children`.
+- Popover does not use `createPortal` (unlike Modal). The panel renders inside the relative container, so it participates in the normal DOM flow. This keeps it simple but means parent overflow clipping could affect visibility in some layouts.
+- The `trigger` prop is rendered as-is (not cloned or wrapped with event handlers). The consumer is responsible for wiring click/toggle behavior on the trigger element and calling `onOpenChange`.
+- Popover does not manage focus trapping or body scroll lock -- it is lightweight by design. For full dialog behavior, use Modal instead.
+
 ## Architecture
 
 ### Dependencies
@@ -424,6 +464,9 @@ Modal
   |-- class-variance-authority (CVA)
   |-- @/lib/classnames (cn)
   |-- @phosphor-icons/react (XIcon)
+
+Popover
+  |-- @/lib/classnames (cn)
 
 TextSuggestion
   |-- class-variance-authority (CVA)
@@ -457,7 +500,7 @@ Pill
 
 3. **ID generation** -- All input components call `useId()` and fall back to it only when no `id` prop is provided (`props.id ?? id`). DateInput also derives a secondary ID (`${inputId}-calendar`) for the popup `aria-controls` linkage.
 
-4. **Export pattern** -- Each file uses `export default function ComponentName()` for the component and a named type export (`export type { ComponentNameProps }`) for props.
+4. **Export pattern** -- Each file uses `export default function ComponentName()` for the component and a named type export (`export type { ComponentNameProps }`) for props. Popover exports its type inline (`export type PopoverProps = { ... }`).
 
 ## Related Documentation
 

@@ -17,8 +17,8 @@ You are an elite Design System Specialist with deep expertise in building and ma
 
 ## Tech Stack & Constraints
 
-- **React 19** with **TypeScript 5.9** (strict mode) — all props must be fully typed
-- **Tailwind 4** — utility classes only, no component libraries like shadcn, MUI, etc.
+- **React** with **TypeScript** (strict mode) — all props must be fully typed
+- **Tailwind** — utility classes only, no component libraries like shadcn, MUI, etc.
 - **Path alias**: `@/*` maps to `src/*` — always use it for cross-directory imports
 - No barrel files (`index.ts`) — import directly from source files
 - Components live in `src/components/common/` with PascalCase file names

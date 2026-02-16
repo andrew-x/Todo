@@ -5,7 +5,7 @@ description: Firebase best practices for this project covering setup, authentica
 
 # Firebase Best Practices
 
-Best practices guide for Firebase in this project (modular SDK v10+, Vite, React). Contains 14 rules across 4 categories, prioritized by impact to guide code generation and review.
+Best practices guide for Firebase in this project (modular SDK, Vite, React). Contains 14 rules across 4 categories, prioritized by impact to guide code generation and review.
 
 ## When to Apply
 
